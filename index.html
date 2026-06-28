@@ -1,0 +1,4834 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6f4e37">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Barista">
+<title>Barista – Kaffee lernen</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f7f6f2; --card:#ffffff; --ink:#1c1b18; --muted:#6b6862; --line:#e7e4dc;
+  --brand:#6f4e37; --brand-soft:#efe6dd; --accent:#c08a3e; --gold:#c08a3e;
+  --good:#3b6e58; --good-soft:#e7f0ea; --bad:#b4452f; --bad-soft:#f6e6e1;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.06);
+  --radius:16px;
+}
+[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121310; --card:#1c1e19; --ink:#ece9e2; --muted:#9c988e; --line:#30332c;
+  --brand-soft:#1b271f; --good:#5aa483; --good-soft:#19241d; --bad:#e0826b; --bad-soft:#2c1b15;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 22px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.wrap{max-width:580px;margin:0 auto;padding:0 16px;
+  padding-top:env(safe-area-inset-top);padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+
+/* header */
+header{position:sticky;top:0;z-index:30;background:var(--bg);
+  padding:calc(12px + env(safe-area-inset-top)) 0 8px;display:flex;align-items:center;gap:8px}
+.brand{font-weight:800;font-size:20px;letter-spacing:-.4px;flex:1}
+.brand b{color:var(--brand)}
+.stat{font-size:13px;font-weight:700;background:var(--card);border:1px solid var(--line);
+  padding:5px 9px;border-radius:999px;box-shadow:var(--shadow);white-space:nowrap}
+.themebtn{font-size:16px;line-height:1;padding:8px 10px;border-radius:10px;
+  color:var(--ink);background:var(--card);border:1px solid var(--line)}
+.themebtn:active{transform:translateY(1px)}
+
+/* tabs */
+.tabs{display:flex;gap:8px;margin:10px 0 14px}
+.tab{flex:1;text-align:center;padding:11px 4px;border-radius:14px;font-weight:700;font-size:13.5px;
+  background:var(--card);border:1px solid var(--line);color:var(--muted);box-shadow:var(--shadow)}
+.tab.on{color:#fff;border-color:transparent}
+.tab:active{transform:translateY(1px)}
+
+/* banner */
+.banner{color:#fff;padding:16px;border-radius:var(--radius);margin-bottom:14px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;cursor:pointer}
+.banner .em{font-size:26px}
+.banner b{font-size:16px;display:block}
+.banner small{opacity:.92;font-size:12.5px;font-weight:600}
+.banner .go{margin-left:auto;font-size:22px;opacity:.9}
+.banner:active{transform:translateY(1px)}
+
+/* category cards */
+.sectit{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);margin:18px 4px 8px}
+.cat{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:13px 14px;margin-bottom:9px;box-shadow:var(--shadow);width:100%;text-align:left}
+.cat:active{transform:translateY(1px)}
+.cat .ic{font-size:22px;width:30px;text-align:center;flex:none}
+.cat .tx{flex:1;min-width:0}
+.cat .tx b{font-weight:700;font-size:15px;display:block}
+.cat .tx small{color:var(--muted);font-size:12.5px}
+.cat .ct{font-size:12px;font-weight:700;color:var(--muted);background:var(--bg);
+  border:1px solid var(--line);border-radius:999px;padding:3px 9px;flex:none}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:10px;margin:6px 0 12px}
+.back{font-size:15px;font-weight:700;color:var(--muted);padding:6px 8px;border-radius:10px;border:1px solid var(--line);background:var(--card)}
+.pbar{flex:1;height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+.pbar i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s ease}
+.qcount{font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.kicker{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--brand);
+  padding:4px 9px;border-radius:999px;margin-bottom:12px}
+.kicker.t-multi{background:var(--accent)} .kicker.t-est{background:var(--gold);color:#1c1b18}
+.kicker.t-match{background:var(--accent)} .kicker.t-order{background:var(--accent)}
+.kicker.t-gap{background:var(--gold);color:#1c1b18} .kicker.t-tf{background:var(--brand)}
+.kicker.t-flip,.kicker.t-recall{background:var(--muted)}
+.qtext{font-size:18px;font-weight:650;line-height:1.4;margin:0 0 4px}
+.qsub{font-size:13px;color:var(--muted);margin:8px 0 2px}
+
+/* options */
+.opts{margin-top:14px;display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  background:var(--bg);border:1.5px solid var(--line);border-radius:13px;padding:13px 14px;font-size:15px}
+.opt .k{flex:none;width:25px;height:25px;border-radius:8px;border:1.5px solid var(--line);
+  display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--muted);background:var(--card)}
+.opt:active{transform:translateY(1px)}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);color:#fff;border-color:var(--brand)}
+.opt.correct{border-color:var(--good);background:var(--good-soft)}
+.opt.correct .k{background:var(--good);color:#fff;border-color:var(--good)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:#fff;border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+
+/* true/false */
+.tf{display:flex;gap:10px;margin-top:16px}
+.tf button{flex:1;padding:18px 8px;border-radius:14px;border:1.5px solid var(--line);
+  background:var(--bg);font-size:17px;font-weight:800}
+.tf button .e{font-size:22px;display:block;margin-bottom:3px}
+.tf button.correct{border-color:var(--good);background:var(--good-soft)}
+.tf button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.tf button.sel{border-color:var(--brand);background:var(--brand-soft)}
+
+/* match */
+.match{display:flex;gap:10px;margin-top:14px}
+.mcol{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0}
+.mitem{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 10px;
+  font-size:13.5px;font-weight:600;text-align:left;position:relative;min-height:46px;display:flex;align-items:center}
+.mitem.active{border-color:var(--brand);background:var(--brand-soft)}
+.mitem.used{opacity:.55}
+.mitem.correct{border-color:var(--good);background:var(--good-soft)}
+.mitem.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mbadge{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;box-shadow:var(--shadow)}
+
+/* order */
+.order{margin-top:14px;display:flex;flex-direction:column;gap:9px}
+.oitem{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:var(--bg);
+  border-radius:12px;padding:11px 12px;font-size:14.5px;font-weight:600}
+.oitem .num{flex:none;width:24px;height:24px;border-radius:7px;background:var(--card);border:1px solid var(--line);
+  display:grid;place-items:center;font-weight:800;font-size:12px;color:var(--muted)}
+.oitem .lbl{flex:1;min-width:0}
+.oitem .arrows{display:flex;flex-direction:column;gap:2px}
+.oitem .arrows button{font-size:13px;line-height:1;padding:3px 7px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-weight:800}
+.oitem.correct{border-color:var(--good);background:var(--good-soft)}
+.oitem.wrong{border-color:var(--bad);background:var(--bad-soft)}
+
+/* gap input */
+.gapin{margin-top:16px;width:100%;font-size:17px;padding:13px 14px;border-radius:13px;
+  border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-weight:600}
+.gapin:focus{outline:none;border-color:var(--brand);background:var(--brand-soft)}
+
+/* estimate slider */
+.est{margin-top:18px}
+.estval{text-align:center;font-size:30px;font-weight:800;color:var(--brand);margin-bottom:8px}
+.estrange{width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;
+  background:var(--line);outline:none}
+.estrange::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;
+  background:var(--brand);border:3px solid var(--card);box-shadow:var(--shadow);cursor:pointer}
+.estrange::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:var(--brand);border:3px solid var(--card);cursor:pointer}
+.estminmax{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px;font-weight:600}
+
+/* flip / recall */
+.flipcard{margin-top:14px;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;
+  padding:20px 16px;min-height:90px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:16px;font-weight:600}
+.hintbox{margin-top:12px;font-size:13.5px;color:var(--muted);font-style:italic}
+.modelbox{margin-top:14px;border-left:3px solid var(--brand);background:var(--brand-soft);
+  border-radius:8px;padding:12px 14px;font-size:14.5px}
+
+/* feedback */
+.fb{margin-top:14px;border-radius:12px;padding:13px 14px;font-size:14.5px;font-weight:500;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--good-soft);color:var(--good);border:1px solid var(--good)}
+.fb.no{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+.fb .h{font-weight:800;display:block;margin-bottom:3px}
+.fb .x{color:var(--ink);font-weight:500}
+
+/* footer action */
+.foot{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);
+  padding:12px 0 calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px}
+.btn{flex:1;padding:15px;border-radius:14px;font-size:16px;font-weight:800;
+  background:var(--brand);color:#fff;box-shadow:var(--shadow)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.good{background:var(--good)} .btn.bad{background:var(--bad)}
+
+/* result */
+.result{text-align:center;padding:30px 16px}
+.result .big{font-size:54px;font-weight:800;margin:8px 0}
+.result .ring{width:130px;height:130px;margin:6px auto 14px;border-radius:50%;
+  display:grid;place-items:center;font-size:34px;font-weight:800;color:#fff}
+.result h2{font-size:22px;margin:4px 0 2px}
+.result p{color:var(--muted);margin:4px 0}
+.pill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:7px 14px;font-weight:700;font-size:14px;margin:5px 4px;box-shadow:var(--shadow)}
+.hidden{display:none!important}
+/* aroma wheel */
+.wheelView{width:100%;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:var(--shadow);padding:6px}
+.wheelView svg{display:block;margin:0 auto;width:100%;max-width:460px;height:auto;touch-action:manipulation}
+.seg{cursor:pointer;transition:opacity .15s} .seg.dim{opacity:.22}
+.wlabel{font-weight:800;fill:#fff;pointer-events:none}
+.wctr{font-weight:800;fill:var(--ink);pointer-events:none;text-anchor:middle}
+.wdetail{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.wdetail h3{margin:0 0 4px;font-size:17px} .wdetail .cap{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--brand)}
+.wdetail p{margin:6px 0 10px;color:var(--muted);font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:12.5px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip:active{transform:translateY(1px)} .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.whint{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 2px}
+.wheelFrame{width:100%;height:80vh;min-height:500px;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;margin-bottom:8px}
+.wheelFrame iframe{width:100%;height:100%;border:0;display:block}
+.dots{display:inline-flex;gap:3px;vertical-align:middle;margin-left:2px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line);display:inline-block}
+.dots i.on{background:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- HEADER -->
+  <header>
+    <div class="brand" id="brandTitle"></div>
+    <div class="stat" id="streakStat">🔥 0</div>
+    <div class="stat" id="xpStat">⭐ 0</div>
+    <button class="themebtn" id="themeBtn" aria-label="Hell/Dunkel">🌙</button>
+  </header>
+
+  <!-- HOME -->
+  <div id="homeView">
+    <div class="tabs" id="tabs"></div>
+    <div id="bannerSlot"></div>
+    <div id="catList"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quizView" class="hidden">
+    <div class="qhead">
+      <button class="back" id="quizBack">‹ Ende</button>
+      <div class="pbar"><i id="pbarFill"></i></div>
+      <div class="qcount" id="qcount"></div>
+    </div>
+    <div id="cardSlot"></div>
+    <div class="foot" id="footSlot"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultView" class="hidden">
+    <div class="result">
+      <div class="ring" id="resRing"></div>
+      <h2 id="resTitle"></h2>
+      <p id="resSub"></p>
+      <div id="resPills"></div>
+    </div>
+    <div class="foot">
+      <button class="btn ghost" id="resHome">Startseite</button>
+      <button class="btn" id="resAgain">Nochmal</button>
+    </div>
+  </div>
+</div>
+
+<script id="cfg" type="application/json">{"brand":"Bari<b>sta</b>","brandColor":"#6f4e37","storeKey":"kaffee_lern_v1","tracks":[{"id":"barista","label":"Barista","emoji":"☕","color":"#6f4e37"},{"id":"sca","label":"SCA-Wissen","emoji":"📐","color":"#9c6b3f"},{"id":"rad","label":"Aromarad","emoji":"🎡","color":"#b07d4b","wheel":true}],"catIcons":{"Espresso-Grundlagen":"☕","Milch & Latte Art":"🥛","Mahlen & Dosieren":"⚙️","Maschine & Wartung":"🔧","Bruehmethoden":"💧","Troubleshooting":"🛠️","Extraktion & Kennzahlen":"📊","Cupping & Sensorik":"👃","Roestung":"🔥","Wasser":"💧","Anbau & Verarbeitung":"🌱","Green Grading & Defekte":"🫘","Standards & Geschichte":"📐","Aromarad & Sensorik":"🎡"}}</script>
+<script id="qdata" type="application/json">[
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welches Verhältnis (Ratio) beschreibt einen klassischen Espresso?",
+  "opts": [
+   "1:1",
+   "1:2",
+   "1:5",
+   "1:10"
+  ],
+  "c": 1,
+  "fb": "Ein typischer Espresso nutzt eine <b>Ratio von ca. 1:2</b>, z. B. 18 g Kaffee zu 36 g Getränk."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "mc",
+  "q": "Mit welchem Bruehdruck arbeitet eine klassische Espressomaschine?",
+  "opts": [
+   "3 bar",
+   "6 bar",
+   "9 bar",
+   "15 bar"
+  ],
+  "c": 2,
+  "fb": "Der Standard-Bruehdruck fuer Espresso liegt bei <b>9 bar</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "est",
+  "q": "Wie lange dauert eine typische Espresso-Extraktion (Sekunden)?",
+  "min": 10,
+  "max": 60,
+  "step": 1,
+  "ans": 27,
+  "tol": 4,
+  "unit": "s",
+  "fb": "Eine klassische Extraktion dauert etwa <b>25-30 s</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "est",
+  "q": "Welche Wassertemperatur ist fuer Espresso ueblich (Grad C)?",
+  "min": 80,
+  "max": 100,
+  "step": 1,
+  "ans": 93,
+  "tol": 3,
+  "unit": "Grad C",
+  "fb": "Die Bruehtemperatur liegt meist bei <b>90-96 Grad C</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "tf",
+  "q": "Beim Tampern wird das Kaffeemehl im Siebtraeger gleichmaessig verdichtet.",
+  "a": true,
+  "fb": "Tampern verdichtet den Puck gleichmaessig, damit das Wasser nicht ungleichmaessig durchlaeuft."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "tf",
+  "q": "Ein Ristretto wird mit mehr Wasser als ein normaler Espresso gezogen.",
+  "a": false,
+  "fb": "Ein <b>Ristretto</b> ist kuerzer und konzentrierter (z. B. Ratio 1:1), nicht laenger."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Was bezeichnet 'Channeling' bei der Espresso-Extraktion?",
+  "opts": [
+   "Gleichmaessiger Wasserfluss",
+   "Wasser sucht sich Kanaele durch den Puck",
+   "Zu hoher Mahlgrad",
+   "Reinigung der Bruehgruppe"
+  ],
+  "c": 1,
+  "fb": "Beim <b>Channeling</b> fliesst Wasser durch Kanaele, was zu ungleichmaessiger Extraktion fuehrt."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Ein Lungo unterscheidet sich vom Espresso vor allem durch ...",
+  "opts": [
+   "hoeheren Druck",
+   "laengere Durchlaufmenge / mehr Wasser",
+   "groeberen Mahlgrad bei gleicher Wassermenge",
+   "kaeltere Bruehtemperatur"
+  ],
+  "c": 1,
+  "fb": "Ein <b>Lungo</b> laeuft laenger durch und ergibt ein groesseres, duenneres Getraenk."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "gap",
+  "q": "Eine typische Espresso-Dosis (Doppio) liegt bei etwa ___ Gramm Kaffeemehl.",
+  "a": [
+   "18",
+   "18g",
+   "18 g",
+   "18-20",
+   "ca. 18"
+  ],
+  "fb": "Uebliche Dosierung im doppelten Sieb: <b>18-20 g</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "order",
+  "q": "Bringe die Schritte der Puck-Prep in die richtige Reihenfolge.",
+  "items": [
+   "Dosieren",
+   "Verteilen / WDT",
+   "Tampern",
+   "Siebtraeger einsetzen",
+   "Extraktion starten"
+  ],
+  "fb": "Erst dosieren und verteilen, dann tampern, einsetzen und extrahieren."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zur Espresso-Zubereitung?",
+  "opts": [
+   "Tampern",
+   "Puck",
+   "Bloom",
+   "Crema"
+  ],
+  "c": 2,
+  "fb": "<b>Bloom</b> (Blooming) gehoert zu Filtermethoden, nicht zur Espresso-Extraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "est",
+  "q": "Schaetze die typische Espresso-Output-Menge bei 18 g Einwaage (Ratio 1:2) in Gramm.",
+  "min": 18,
+  "max": 60,
+  "step": 1,
+  "ans": 36,
+  "tol": 4,
+  "unit": "g",
+  "fb": "18 g bei 1:2 ergeben rund <b>36 g</b> Output."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "flip",
+  "front": "Was bedeutet 'Pre-Infusion' beim Espresso?",
+  "reveal": "Eine kurze Vorbenetzung des Pucks mit niedrigem Druck, um ihn gleichmaessig zu saettigen und Channeling zu reduzieren."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "tf",
+  "q": "Crema ist die goldbraune Schaumschicht auf einem frisch gezogenen Espresso.",
+  "a": true,
+  "fb": "Die <b>Crema</b> entsteht aus emulgierten Oelen und geloestem CO2."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Massnahme erhoeht tendenziell die Durchlaufzeit eines zu schnell laufenden Espressos?",
+  "opts": [
+   "Groeberer Mahlgrad",
+   "Feinerer Mahlgrad",
+   "Weniger Kaffee dosieren",
+   "Hoehere Temperatur"
+  ],
+  "c": 1,
+  "fb": "Ein <b>feinerer Mahlgrad</b> erhoeht den Widerstand und verlangsamt den Durchlauf."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Ratio passt am ehesten zu einem Ristretto?",
+  "opts": [
+   "1:1",
+   "1:2",
+   "1:3",
+   "1:4"
+  ],
+  "c": 0,
+  "fb": "Ein <b>Ristretto</b> ist sehr konzentriert, etwa Ratio 1:1."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "mc",
+  "q": "Was ist ein 'Doppio'?",
+  "opts": [
+   "Ein einfacher Espresso",
+   "Ein doppelter Espresso",
+   "Ein Espresso mit Milch",
+   "Ein mit Wasser verlaengerter Espresso"
+  ],
+  "c": 1,
+  "fb": "Ein <b>Doppio</b> ist ein doppelter Espresso aus dem doppelten Sieb."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne von kuerzester zu laengster Getraenkemenge (gleiche Einwaage).",
+  "items": [
+   "Ristretto",
+   "Espresso",
+   "Lungo"
+  ],
+  "fb": "Ristretto ist am kuerzesten, Lungo am laengsten."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "tf",
+  "q": "Bei gleicher Einwaage fuehrt ein laengerer Bezug (mehr Output) tendenziell zu hoeherer Extraktion.",
+  "a": true,
+  "fb": "Mehr Wasser loest mehr Feststoffe - bis zur Ueberextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 1,
+  "ty": "flip",
+  "front": "Was beschreibt die 'Ratio' beim Espresso?",
+  "reveal": "Das Verhaeltnis von Kaffee-Einwaage zu fluessigem Output, z. B. 18 g zu 36 g = 1:2."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "est",
+  "q": "Auf welche Temperatur sollte Milch beim Aufschaeumen maximal erhitzt werden (Grad C)?",
+  "min": 40,
+  "max": 90,
+  "step": 1,
+  "ans": 63,
+  "tol": 4,
+  "unit": "Grad C",
+  "fb": "Ideal sind etwa <b>60-65 Grad C</b>; darueber wird die Milch kochig."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wie nennt man den feinporigen Milchschaum fuer Latte Art?",
+  "opts": [
+   "Makroschaum",
+   "Mikroschaum",
+   "Trockenschaum",
+   "Kaltschaum"
+  ],
+  "c": 1,
+  "fb": "<b>Mikroschaum</b> ist feinporig und glaenzend - ideal fuer Latte Art."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "order",
+  "q": "Bringe die Phasen des Milchschaeumens in die richtige Reihenfolge.",
+  "items": [
+   "Dampflanze knapp unter die Oberflaeche",
+   "Ziehphase (Luft einziehen)",
+   "Lanze tiefer eintauchen",
+   "Rollphase (Wirbel / Texturieren)",
+   "Dampf stoppen und Kaennchen abklopfen"
+  ],
+  "fb": "Erst Luft ziehen, dann durch Wirbeln texturieren."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Getraenk und typisches Verhaeltnis zu.",
+  "pairs": [
+   [
+    "Cappuccino",
+    "ca. 1/3 Espresso, 1/3 Milch, 1/3 Schaum"
+   ],
+   [
+    "Latte Macchiato",
+    "viel Milch, wenig Schaum, Espresso obenauf"
+   ],
+   [
+    "Flat White",
+    "Doppel-Espresso, wenig duenner Mikroschaum"
+   ],
+   [
+    "Espresso Macchiato",
+    "Espresso mit nur einem Klecks Schaum"
+   ]
+  ],
+  "fb": "Die Verhaeltnisse unterscheiden die Milchgetraenke."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "tf",
+  "q": "Ein Flat White enthaelt im Verhaeltnis mehr Schaum als ein klassischer Cappuccino.",
+  "a": false,
+  "fb": "Ein <b>Flat White</b> hat eine duennere Mikroschaumschicht und wirkt flacher."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 3,
+  "ty": "mc",
+  "q": "Was passiert, wenn Milch ueber ca. 70 Grad C erhitzt wird?",
+  "opts": [
+   "Sie wird suesser",
+   "Proteine denaturieren, kochiger Geschmack",
+   "Der Schaum wird stabiler",
+   "Nichts Wesentliches"
+  ],
+  "c": 1,
+  "fb": "Ueber ca. 70 Grad C denaturieren Proteine, die Milch schmeckt kochig und der Schaum bricht zusammen."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zum Milchschaeumen?",
+  "opts": [
+   "Ziehphase",
+   "Rollphase",
+   "Texturieren",
+   "Backflush"
+  ],
+  "c": 3,
+  "fb": "<b>Backflush</b> ist eine Reinigungsmethode der Bruehgruppe, nicht Teil des Schaeumens."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die suessliche Wahrnehmung beim Aufschaeumen entsteht u. a. durch den Milchzucker ___.",
+  "a": [
+   "Laktose",
+   "Lactose"
+  ],
+  "fb": "<b>Laktose</b> wird durch Erwaermen besser wahrnehmbar; Ueberhitzen zerstoert diesen Effekt."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 3,
+  "ty": "flip",
+  "front": "Warum bildet hoch erhitzte oder alte Milch oft schlechteren Schaum?",
+  "reveal": "Frische, kalte Milch und intakte Proteine stabilisieren den Schaum; Ueberhitzen oder Alter destabilisiert die Eiweissstruktur."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welches Werkzeug dient dem Aufschaeumen der Milch an der Espressomaschine?",
+  "opts": [
+   "Tamper",
+   "Dampflanze",
+   "Siebtraeger",
+   "WDT-Tool"
+  ],
+  "c": 1,
+  "fb": "Die <b>Dampflanze</b> (Steam Wand) erhitzt und texturiert die Milch."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welches Latte-Art-Motiv gilt als Einsteiger-Klassiker?",
+  "opts": [
+   "Rosetta",
+   "Schwan",
+   "Herz",
+   "Tulpe"
+  ],
+  "c": 2,
+  "fb": "Das <b>Herz</b> ist das gaengigste Einsteigermotiv."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "est",
+  "q": "Wie hoch ist grob der Schaum-Anteil eines klassischen Cappuccinos in Prozent (Drittel-Regel)?",
+  "min": 0,
+  "max": 100,
+  "step": 5,
+  "ans": 33,
+  "tol": 10,
+  "unit": "%",
+  "fb": "Grob ein Drittel, also rund <b>33 %</b> Schaum."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Nenne die zwei Hauptphasen des Milchschaeumens.",
+  "hint": "Luft vs. Wirbel",
+  "model": "Ziehphase (Luft einziehen) und Rollphase (Texturieren / Wirbeln zum Homogenisieren)."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welches Getraenk enthaelt normalerweise KEINE aufgeschaeumte Milch?",
+  "opts": [
+   "Cappuccino",
+   "Latte",
+   "Flat White",
+   "Ristretto"
+  ],
+  "c": 3,
+  "fb": "Ein <b>Ristretto</b> ist ein reiner, kurzer Espresso ohne Milch."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 1,
+  "ty": "mc",
+  "q": "Dein Espresso laeuft zu schnell durch und schmeckt sauer. Was tun?",
+  "opts": [
+   "Groeber mahlen",
+   "Feiner mahlen",
+   "Mehr Wasser",
+   "Niedrigere Temperatur"
+  ],
+  "c": 1,
+  "fb": "Zu schneller, saurer Espresso = unterextrahiert, also <b>feiner mahlen</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "mc",
+  "q": "Dein Espresso tropft sehr langsam und schmeckt bitter. Welche Korrektur?",
+  "opts": [
+   "Feiner mahlen",
+   "Groeber mahlen",
+   "Staerker tampern",
+   "Mehr dosieren"
+  ],
+  "c": 1,
+  "fb": "Sehr langsam und bitter = ueberextrahiert, also <b>groeber mahlen</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Muehlentyp / Begriff der Beschreibung zu.",
+  "pairs": [
+   [
+    "Scheibenmahlwerk",
+    "zwei parallele Scheiben, gleichmaessig"
+   ],
+   [
+    "Kegelmahlwerk",
+    "Kegel im Ring, mahlt kuehler / langsamer"
+   ],
+   [
+    "WDT",
+    "Auflockern des Mehls mit Nadeln"
+   ],
+   [
+    "RDT",
+    "Tropfen Wasser gegen statische Aufladung"
+   ]
+  ],
+  "fb": "Muehlentypen und Vorbereitungstechniken im Ueberblick."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die Technik mit duennen Nadeln zum Auflockern des Kaffeemehls heisst ___ (Abkuerzung).",
+  "a": [
+   "WDT",
+   "Weiss Distribution Technique"
+  ],
+  "fb": "<b>WDT</b> (Weiss Distribution Technique) verteilt das Mehl und reduziert Klumpen / Channeling."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 3,
+  "ty": "gap",
+  "q": "Ein Tropfen Wasser auf die Bohnen gegen statische Aufladung nennt man ___ (Abkuerzung).",
+  "a": [
+   "RDT",
+   "Ross Droplet Technique"
+  ],
+  "fb": "<b>RDT</b> (Ross Droplet Technique) reduziert statische Aufladung und Spritzer beim Mahlen."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 1,
+  "ty": "tf",
+  "q": "Frisch gemahlener Kaffee ist statisch oft staerker aufgeladen als ganze Bohnen.",
+  "a": true,
+  "fb": "Beim Mahlen entsteht Reibung und damit statische Aufladung; RDT hilft dagegen."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Mahlgrad passt NICHT zu Espresso?",
+  "opts": [
+   "fein",
+   "sehr fein",
+   "mittel-fein",
+   "grob wie French Press"
+  ],
+  "c": 3,
+  "fb": "<b>Grob</b> wie French Press ist fuer Espresso viel zu grob."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Aussage zur Dosierung ('Dosing') stimmt?",
+  "opts": [
+   "Mehr Kaffee = immer besser",
+   "Konsistente Einwaage sorgt fuer reproduzierbare Ergebnisse",
+   "Dosierung beeinflusst den Geschmack nicht",
+   "Dosierung ersetzt das Tampern"
+  ],
+  "c": 1,
+  "fb": "Eine <b>konsistente Einwaage</b> ist Grundlage fuer reproduzierbaren Espresso."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 3,
+  "ty": "flip",
+  "front": "Warum gilt ein Kegelmahlwerk oft als 'kuehler' mahlend?",
+  "reveal": "Es laeuft meist langsamer und erzeugt weniger Reibungswaerme, was Aroma und Konsistenz schonen kann."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "recall",
+  "prompt": "Nenne zwei Stellschrauben, um einen unterextrahierten Espresso zu korrigieren.",
+  "hint": "Mahlgrad, Dosis, Zeit, Temperatur",
+  "model": "Feiner mahlen, Dosis leicht erhoehen, Bruehzeit verlaengern oder Temperatur leicht anheben."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 1,
+  "ty": "tf",
+  "q": "Ein groeberer Mahlgrad beschleunigt in der Regel die Espresso-Durchlaufzeit.",
+  "a": true,
+  "fb": "Groeber = weniger Widerstand = <b>schnellerer</b> Durchlauf."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welcher Begriff beschreibt KEINE Verteilungs- oder Vorbereitungstechnik?",
+  "opts": [
+   "WDT",
+   "Nutating Tamp",
+   "Leveling",
+   "Backflush"
+  ],
+  "c": 3,
+  "fb": "<b>Backflush</b> ist Reinigung, keine Puck-Vorbereitung."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 3,
+  "ty": "est",
+  "q": "Wie viele Gramm wiegt eine typische Einzel-Espressodosis (Single)?",
+  "min": 5,
+  "max": 20,
+  "step": 1,
+  "ans": 9,
+  "tol": 2,
+  "unit": "g",
+  "fb": "Eine Single liegt grob bei <b>8-10 g</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wozu dient das 'Backflushing' (Rueckspuelen)?",
+  "opts": [
+   "Mahlgrad einstellen",
+   "Bruehgruppe / Dusche reinigen",
+   "Milch aufschaeumen",
+   "Wasser entkalken"
+  ],
+  "c": 1,
+  "fb": "<b>Backflushing</b> mit Blindsieb reinigt Bruehgruppe und Dreiwegeventil von Kaffeefett."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 1,
+  "ty": "tf",
+  "q": "Backflushing wird mit einem Blindsieb (ohne Loecher) durchgefuehrt.",
+  "a": true,
+  "fb": "Das <b>Blindsieb</b> laesst kein Wasser durch, sodass Druck zurueck in die Gruppe gespuelt wird."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "gap",
+  "q": "Eine ___-Steuerung haelt die Bruehtemperatur der Maschine konstant (Abkuerzung).",
+  "a": [
+   "PID",
+   "PID-Regler"
+  ],
+  "fb": "Ein <b>PID</b>-Regler regelt die Temperatur praezise und stabil."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Womit entfernt man Kalkablagerungen im Wasserkreislauf?",
+  "opts": [
+   "Backflush-Pulver",
+   "Entkalker (Saeureloesung)",
+   "Milchsystemreiniger",
+   "Blindsieb"
+  ],
+  "c": 1,
+  "fb": "<b>Entkalken</b> loest Kalk im Boiler und in Leitungen; Backflush reinigt dagegen Kaffeefett."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welches Teil gehoert NICHT direkt zur Bruehgruppe?",
+  "opts": [
+   "Dusche / Sieb (Shower Screen)",
+   "Gruppendichtung",
+   "Dreiwegeventil",
+   "Dampflanze"
+  ],
+  "c": 3,
+  "fb": "Die <b>Dampflanze</b> gehoert zum Milchsystem, nicht zur Bruehgruppe."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 3,
+  "ty": "mc",
+  "q": "Was beschreibt 'Druckprofiling' (Pressure Profiling)?",
+  "opts": [
+   "Konstante 9 bar ueber die ganze Extraktion",
+   "Gezieltes Veraendern des Drucks waehrend der Extraktion",
+   "Den Mahldruck der Muehle",
+   "Den Dampfdruck beim Milchschaeumen"
+  ],
+  "c": 1,
+  "fb": "Beim <b>Druckprofiling</b> wird der Druckverlauf gezielt gesteuert (z. B. niedrig starten)."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 1,
+  "ty": "order",
+  "q": "Bringe eine einfache taegliche Reinigungsroutine in sinnvolle Reihenfolge.",
+  "items": [
+   "Siebtraeger und Sieb ausspuelen",
+   "Bruehgruppe spuelen (Flush)",
+   "Dampflanze kurz abblasen",
+   "Dampflanze aussen abwischen",
+   "Tropfschale leeren"
+  ],
+  "fb": "Eine konsistente Routine haelt die Maschine sauber."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "tf",
+  "q": "Hartes Wasser beguenstigt Kalkablagerungen in der Espressomaschine.",
+  "a": true,
+  "fb": "Viel Calcium / Magnesium (hartes Wasser) fuehrt schneller zu <b>Kalk</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Erklaere kurz den Unterschied zwischen Backflushing und Entkalken.",
+  "hint": "Kaffeefett vs. Kalk",
+  "model": "Backflushing entfernt Kaffeefett aus Bruehgruppe und Ventil; Entkalken loest Kalkablagerungen im Wasserkreislauf / Boiler."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Was ist der Siebtraeger?",
+  "opts": [
+   "Der Wasserbehaelter",
+   "Der Halter mit Sieb fuer das Kaffeemehl",
+   "Die Dampflanze",
+   "Die Muehle"
+  ],
+  "c": 1,
+  "fb": "Der <b>Siebtraeger</b> (Portafilter) haelt das Sieb mit dem Kaffeepuck."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "tf",
+  "q": "Ein PID-Regler ist vor allem fuer stabile Bruehtemperaturen zustaendig.",
+  "a": true,
+  "fb": "Der <b>PID</b> haelt die Temperatur konstant statt sie nur grob zu schalten."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 3,
+  "ty": "odd",
+  "q": "Welche Taetigkeit ist KEINE regelmaessige Wartung?",
+  "opts": [
+   "Entkalken",
+   "Backflushing",
+   "Dichtungen pruefen",
+   "Bohnen roesten"
+  ],
+  "c": 3,
+  "fb": "<b>Roesten</b> ist keine Maschinenwartung."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 1,
+  "ty": "mc",
+  "q": "Was bezeichnet das 'Blooming' bei Filterkaffee?",
+  "opts": [
+   "Das Vorquellen des Kaffees mit etwas Wasser",
+   "Das finale Aufgiessen",
+   "Das Mahlen",
+   "Das Filtern"
+  ],
+  "c": 0,
+  "fb": "Beim <b>Blooming</b> wird der Kaffee mit wenig Wasser vorbenetzt, damit CO2 entweicht."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 1,
+  "ty": "est",
+  "q": "Welche Brueh-Ratio (Kaffee:Wasser) ist fuer Filterkaffee typisch? Gib den Teiler an (1:x).",
+  "min": 10,
+  "max": 20,
+  "step": 1,
+  "ans": 16,
+  "tol": 1,
+  "unit": "Teiler",
+  "fb": "Filterkaffee liegt grob bei <b>1:15 bis 1:17</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Bruehmethode und typischen Mahlgrad zu.",
+  "pairs": [
+   [
+    "Espresso",
+    "fein"
+   ],
+   [
+    "V60 / Pour-over",
+    "mittel-fein"
+   ],
+   [
+    "French Press",
+    "grob"
+   ],
+   [
+    "Cold Brew",
+    "grob"
+   ]
+  ],
+  "fb": "Mahlgrad richtet sich nach Kontaktzeit und Methode."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welche Methode ist KEINE Filter- oder Handbruehmethode?",
+  "opts": [
+   "V60",
+   "Chemex",
+   "AeroPress",
+   "Siebtraeger-Espresso"
+  ],
+  "c": 3,
+  "fb": "Der <b>Siebtraeger-Espresso</b> ist eine Druckmethode, keine Filtermethode."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "tf",
+  "q": "Cold Brew wird typischerweise mit grobem Mahlgrad und langer Kontaktzeit (Stunden) zubereitet.",
+  "a": true,
+  "fb": "<b>Cold Brew</b> extrahiert kalt ueber 12-24 h mit grobem Mahlgrad."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Methode arbeitet mit Druck durch einen Kolben und kurzer Bruehzeit?",
+  "opts": [
+   "French Press",
+   "AeroPress",
+   "Chemex",
+   "Cold Brew"
+  ],
+  "c": 1,
+  "fb": "Die <b>AeroPress</b> presst das Wasser per Kolben durch einen Filter."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 1,
+  "ty": "order",
+  "q": "Bringe die Schritte eines V60-Pour-overs in die richtige Reihenfolge.",
+  "items": [
+   "Filter spuelen",
+   "Kaffee einfuellen",
+   "Blooming (vorquellen)",
+   "In Kreisen aufgiessen",
+   "Abtropfen lassen"
+  ],
+  "fb": "Erst spuelen und bloomen, dann gleichmaessig aufgiessen."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die French Press arbeitet als Vollimmersion; der Kaffee wird am Ende durch ein ___ getrennt.",
+  "a": [
+   "Sieb",
+   "Metallsieb",
+   "Filtersieb"
+  ],
+  "fb": "Das Metall-<b>Sieb</b> drueckt den Satz nach unten (Vollimmersion)."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 3,
+  "ty": "flip",
+  "front": "Warum bloomt man frisch geroesteten Kaffee besonders?",
+  "reveal": "Frischer Kaffee enthaelt viel CO2; das Vorquellen laesst Gas entweichen, damit Wasser den Kaffee gleichmaessig durchdringt."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wofuer ist die Chemex bekannt?",
+  "opts": [
+   "Dicker Papierfilter, sehr klarer Body",
+   "Vollimmersion ohne Filter",
+   "Druckbruehung",
+   "Kalte Extraktion"
+  ],
+  "c": 0,
+  "fb": "Die <b>Chemex</b> nutzt einen dickeren Papierfilter und liefert einen sehr klaren, sauberen Kaffee."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 3,
+  "ty": "est",
+  "q": "Wie viel Wasser brauchst du bei 20 g Kaffee und Ratio 1:16 (in Gramm)?",
+  "min": 200,
+  "max": 400,
+  "step": 5,
+  "ans": 320,
+  "tol": 15,
+  "unit": "g",
+  "fb": "20 g mal 16 = <b>320 g</b> Wasser."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Methode ist eine klassische Vollimmersion?",
+  "opts": [
+   "V60",
+   "French Press",
+   "Chemex",
+   "Siebtraeger"
+  ],
+  "c": 1,
+  "fb": "Die <b>French Press</b> ist eine Vollimmersionsmethode."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "tf",
+  "q": "Bei der AeroPress kann sowohl Immersion als auch Druck zum Einsatz kommen.",
+  "a": true,
+  "fb": "Die <b>AeroPress</b> kombiniert Einweichen (Immersion) mit Kolbendruck."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 3,
+  "ty": "mc",
+  "q": "Warum spuelt man den Papierfilter vor dem Bruehen oft mit Wasser?",
+  "opts": [
+   "Um Filter zu waermen und Papiergeschmack zu reduzieren",
+   "Um den Kaffee zu mahlen",
+   "Um die Ratio zu aendern",
+   "Um CO2 zuzufuehren"
+  ],
+  "c": 0,
+  "fb": "Vorspuelen entfernt Papiergeschmack und waermt Filter und Gefaess vor."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 1,
+  "ty": "mc",
+  "q": "Ein Espresso schmeckt sauer und duenn. Wahrscheinliche Ursache?",
+  "opts": [
+   "Ueberextraktion",
+   "Unterextraktion",
+   "Zu hohe Temperatur",
+   "Zu wenig Druck"
+  ],
+  "c": 1,
+  "fb": "Sauer und duenn deutet auf <b>Unterextraktion</b> hin."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 1,
+  "ty": "mc",
+  "q": "Ein Espresso schmeckt bitter und trocken / adstringierend. Wahrscheinliche Ursache?",
+  "opts": [
+   "Unterextraktion",
+   "Ueberextraktion",
+   "Zu grober Mahlgrad",
+   "Zu wenig Kaffee"
+  ],
+  "c": 1,
+  "fb": "Bitter und adstringierend = <b>Ueberextraktion</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Symptom und passende Korrektur zu.",
+  "pairs": [
+   [
+    "Zu sauer / unterextrahiert",
+    "Feiner mahlen / laenger extrahieren"
+   ],
+   [
+    "Zu bitter / ueberextrahiert",
+    "Groeber mahlen / kuerzer extrahieren"
+   ],
+   [
+    "Wenig / blasse Crema",
+    "Frischere Bohnen / feiner mahlen"
+   ],
+   [
+    "Channeling im Puck",
+    "Bessere Verteilung (WDT) / gleichmaessig tampern"
+   ]
+  ],
+  "fb": "Jedes Symptom hat eine typische Gegenmassnahme."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "tf",
+  "q": "Sehr alte (entgaste) Bohnen koennen zu wenig oder blasser Crema fuehren.",
+  "a": true,
+  "fb": "Mit der Zeit entweicht CO2; alte Bohnen liefern weniger <b>Crema</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 3,
+  "ty": "mc",
+  "q": "Dein Milchschaum hat grosse, grobe Blasen. Was ist meist die Ursache?",
+  "opts": [
+   "Zu lange Rollphase",
+   "Zu viel Luft / zu lange Ziehphase",
+   "Zu kalte Milch",
+   "Zu wenig Dampfdruck"
+  ],
+  "c": 1,
+  "fb": "Grobblasiger Schaum entsteht oft, wenn zu viel Luft eingezogen (zu lange Ziehphase) wurde."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welche Massnahme hilft NICHT gegen einen ueberextrahierten Espresso?",
+  "opts": [
+   "Groeber mahlen",
+   "Kuerzere Bruehzeit",
+   "Temperatur leicht senken",
+   "Noch feiner mahlen"
+  ],
+  "c": 3,
+  "fb": "Noch <b>feiner</b> mahlen verstaerkt die Ueberextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Ein Espresso laeuft in 18 s durch und schmeckt sauer. Nenne deine erste Korrektur.",
+  "hint": "Mahlgrad / Zeit",
+  "model": "Feiner mahlen, um Durchlaufzeit und Extraktion zu erhoehen (Richtung 25-30 s)."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "gap",
+  "q": "Ungleichmaessiger Wasserfluss durch Kanaele im Puck heisst ___.",
+  "a": [
+   "Channeling",
+   "Kanalbildung"
+  ],
+  "fb": "<b>Channeling</b> fuehrt zu gleichzeitiger Unter- und Ueberextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 1,
+  "ty": "tf",
+  "q": "Gleichmaessiges Tampern reduziert die Gefahr von Channeling.",
+  "a": true,
+  "fb": "Eine ebene, gleichmaessige Verdichtung beugt Kanalbildung vor."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "mc",
+  "q": "Crema ist sehr hell und loest sich schnell auf. Moegliche Ursache?",
+  "opts": [
+   "Sehr frische Bohnen",
+   "Alte / entgaste Bohnen oder Unterextraktion",
+   "Zu feiner Mahlgrad",
+   "Zu hohe Dosis"
+  ],
+  "c": 1,
+  "fb": "Helle, instabile Crema deutet oft auf alte Bohnen oder Unterextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 1,
+  "ty": "tf",
+  "q": "Bitterer Espresso laesst sich oft durch groeberen Mahlgrad verbessern.",
+  "a": true,
+  "fb": "Groeber mahlen reduziert die Extraktion und damit Bitterkeit bei Ueberextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 3,
+  "ty": "flip",
+  "front": "Espresso schmeckt gleichzeitig sauer UND bitter - woran liegt das oft?",
+  "reveal": "An ungleichmaessiger Extraktion (Channeling): Teile des Pucks sind unter-, andere ueberextrahiert."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Faktoren koennen Channeling beguenstigen?",
+  "opts": [
+   "Ungleichmaessiges Tampern",
+   "Klumpen im Kaffeemehl",
+   "Risse im Puck",
+   "Perfekte Verteilung",
+   "Schraeges Tampern"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Gleichmaessige Verteilung und ebenes Tampern verhindern Channeling - perfekte Verteilung hilft also gerade dagegen."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 1,
+  "ty": "est",
+  "q": "Welche Extraktionsausbeute gilt laut SCA als ideal (Mittelwert, %)?",
+  "min": 14,
+  "max": 26,
+  "step": 1,
+  "ans": 20,
+  "tol": 2,
+  "unit": "%",
+  "fb": "Das Golden-Cup-Fenster liegt bei <b>18-22 %</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "est",
+  "q": "Welcher TDS-Wert gilt fuer gebruehten Filterkaffee als ideal (Mittelwert, %)?",
+  "min": 0.8,
+  "max": 1.8,
+  "step": 0.05,
+  "ans": 1.25,
+  "tol": 0.12,
+  "unit": "%",
+  "fb": "Idealer TDS-Bereich: <b>1,15-1,35 %</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wofuer steht TDS in der Kaffee-Kennzahl?",
+  "opts": [
+   "Total Dissolved Solids",
+   "Time Dependent Strength",
+   "Total Dose Size",
+   "Temperature Drop System"
+  ],
+  "c": 0,
+  "fb": "<b>TDS</b> = Total Dissolved Solids, ein Mass fuer die Staerke (Strength) des Getraenks."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Was beschreibt die Extraktionsausbeute (Extraction Yield)?",
+  "opts": [
+   "Wieviel Wasser verwendet wurde",
+   "Anteil des Kaffees, der ins Getraenk uebergegangen ist",
+   "Die Bruehtemperatur",
+   "Die Crema-Menge"
+  ],
+  "c": 1,
+  "fb": "Die <b>Extraktionsausbeute</b> ist der prozentuale Anteil loeslicher Stoffe, der extrahiert wurde."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Achsen bildet die SCA Brewing Control Chart primaer ab?",
+  "opts": [
+   "Zeit und Druck",
+   "Strength (TDS) und Extraktionsausbeute",
+   "Temperatur und Mahlgrad",
+   "Ratio und Crema"
+  ],
+  "c": 1,
+  "fb": "Die <b>Brewing Control Chart</b> traegt Strength (TDS) gegen Extraktion auf."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "tf",
+  "q": "'Strength' (Staerke) und 'Extraction' (Extraktion) bezeichnen dasselbe.",
+  "a": false,
+  "fb": "<b>Strength</b> (TDS, Konzentration) und <b>Extraction</b> (ausgeloester Anteil) sind verschiedene Groessen."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "gap",
+  "q": "Das Verhaeltnis von Kaffee zu Wasser nennt man ___ (englischer Fachbegriff).",
+  "a": [
+   "Brew Ratio",
+   "Brew-Ratio",
+   "Ratio",
+   "Bruehverhaeltnis"
+  ],
+  "fb": "Die <b>Brew Ratio</b> ist das Verhaeltnis von Kaffee zu Bruehwasser."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Was beschreibt der 'Golden Cup Standard' grob?",
+  "opts": [
+   "Nur die richtige Temperatur",
+   "Ein Zielfenster aus Staerke und Extraktion fuer idealen Kaffee",
+   "Eine Roestkurve",
+   "Eine Wasserhaerte"
+  ],
+  "c": 1,
+  "fb": "Der <b>Golden Cup</b> definiert ein Zielfenster aus Extraktion (~18-22 %) und Staerke (TDS)."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zu Brueh-Kennzahlen?",
+  "opts": [
+   "TDS",
+   "Extraktionsausbeute",
+   "Brew Ratio",
+   "Agtron"
+  ],
+  "c": 3,
+  "fb": "<b>Agtron</b> beschreibt den Roestgrad, nicht die Brueh-Kennzahlen."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "flip",
+  "front": "Wie haengen TDS, Extraktion und Brew Ratio grob zusammen?",
+  "reveal": "TDS misst die Konzentration im Getraenk; Extraktion ist der geloeste Anteil des Kaffees; bei gegebener Ratio bestimmt die Extraktion, wie viel im Wasser landet."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "tf",
+  "q": "Unterextraktion (<18 %) schmeckt eher sauer / grasig, Ueberextraktion (>22 %) eher bitter.",
+  "a": true,
+  "fb": "<18 % = unterextrahiert (sauer), >22 % = ueberextrahiert (bitter)."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Nenne das ideale Extraktionsfenster nach SCA in Prozent.",
+  "hint": "zwei Zahlen",
+  "model": "Etwa 18-22 % Extraktionsausbeute (Golden Cup)."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 1,
+  "ty": "tf",
+  "q": "Eine hoehere Brew Ratio (mehr Wasser pro Kaffee) ergibt tendenziell ein schwaecheres (niedrigerer TDS) Getraenk.",
+  "a": true,
+  "fb": "Mehr Wasser pro Gramm Kaffee senkt die Konzentration (TDS)."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wenn dein Filterkaffee TDS 1,10 % und Extraktion 16 % hat, ist er ...",
+  "opts": [
+   "zu stark und ueberextrahiert",
+   "eher schwach und unterextrahiert",
+   "perfekt im Golden Cup",
+   "ueberdosiert"
+  ],
+  "c": 1,
+  "fb": "Niedriger TDS plus <18 % = eher schwach und <b>unterextrahiert</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "est",
+  "q": "Untere Grenze des idealen Extraktionsfensters nach SCA (%)?",
+  "min": 10,
+  "max": 25,
+  "step": 1,
+  "ans": 18,
+  "tol": 1,
+  "unit": "%",
+  "fb": "Die untere Grenze liegt bei <b>18 %</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "est",
+  "q": "Obere Grenze des idealen Extraktionsfensters nach SCA (%)?",
+  "min": 15,
+  "max": 30,
+  "step": 1,
+  "ans": 22,
+  "tol": 1,
+  "unit": "%",
+  "fb": "Die obere Grenze liegt bei <b>22 %</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Groessen liest man aus der Brewing Control Chart bzw. braucht man dafuer?",
+  "opts": [
+   "TDS / Strength",
+   "Extraktionsausbeute",
+   "Brew Ratio",
+   "Latte-Art-Motiv",
+   "Bruehwassermenge"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Strength, Extraktion, Ratio und Wassermenge gehoeren dazu - das Latte-Art-Motiv nicht."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "est",
+  "q": "Wie viel Kaffee schreibt das klassische SCA-Cupping je 150 ml Wasser vor (Gramm)?",
+  "min": 5,
+  "max": 12,
+  "step": 0.25,
+  "ans": 8.25,
+  "tol": 0.5,
+  "unit": "g",
+  "fb": "Die klassische Einwaage ist <b>8,25 g / 150 ml</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "est",
+  "q": "Ab welcher Punktzahl gilt ein Kaffee im klassischen SCA-Cupping als 'Specialty'?",
+  "min": 60,
+  "max": 100,
+  "step": 1,
+  "ans": 80,
+  "tol": 1,
+  "unit": "Punkte",
+  "fb": "Ab <b>80 Punkten</b> gilt ein Kaffee als Specialty."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welches Bruehverhaeltnis entspricht der klassischen Cupping-Einwaage (8,25 g / 150 ml)?",
+  "opts": [
+   "ca. 1:12",
+   "ca. 1:15",
+   "ca. 1:18",
+   "ca. 1:25"
+  ],
+  "c": 2,
+  "fb": "8,25 g auf 150 ml entsprechen rund <b>1:18,18</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wie nennt man das Durchbrechen der Kaffeekruste beim Cupping?",
+  "opts": [
+   "Bloom",
+   "Crust break",
+   "Flushing",
+   "Skimming"
+  ],
+  "c": 1,
+  "fb": "Das <b>Crust break</b> erfolgt nach einigen Minuten Ziehzeit."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "est",
+  "q": "Nach wie vielen Minuten wird beim Cupping ueblicherweise die Kruste gebrochen?",
+  "min": 1,
+  "max": 10,
+  "step": 1,
+  "ans": 4,
+  "tol": 1,
+  "unit": "min",
+  "fb": "Das Crust break erfolgt nach etwa <b>3-5 Minuten</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche der folgenden Attribute werden im SCA-Cupping bewertet?",
+  "opts": [
+   "Fragrance / Aroma",
+   "Acidity",
+   "Body",
+   "Mahlgrad der Muehle",
+   "Sweetness",
+   "Verpackungsfarbe"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Bewertet werden u. a. <b>Fragrance/Aroma, Acidity, Body, Sweetness</b> - nicht Muehle oder Verpackung."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche dieser Begriffe sind klassische Cupping-Attribute?",
+  "opts": [
+   "Flavor",
+   "Aftertaste",
+   "Balance",
+   "Uniformity",
+   "Clean Cup",
+   "Agtron"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "fb": "<b>Agtron</b> ist eine Roestmessung; die uebrigen sind Cupping-Attribute."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Cupping-Attribut und Bedeutung zu.",
+  "pairs": [
+   [
+    "Acidity",
+    "wahrgenommene Saeure / Lebendigkeit"
+   ],
+   [
+    "Body",
+    "Mundgefuehl / Gewicht"
+   ],
+   [
+    "Aftertaste",
+    "Nachgeschmack"
+   ],
+   [
+    "Uniformity",
+    "Gleichmaessigkeit ueber die Tassen"
+   ],
+   [
+    "Clean Cup",
+    "Abwesenheit von Fehlnoten"
+   ]
+  ],
+  "fb": "Die Attribute beschreiben verschiedene Dimensionen der Tasse."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "order",
+  "q": "Bringe typische Cupping-Schritte in die richtige Reihenfolge.",
+  "items": [
+   "Trockene Fragrance riechen",
+   "Mit heissem Wasser aufgiessen",
+   "Nasse Aroma / Kruste riechen",
+   "Kruste brechen",
+   "Mit Loeffel schluerfen und bewerten"
+  ],
+  "fb": "Erst trocken riechen, dann aufgiessen, brechen und schluerfen."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "tf",
+  "q": "Beim Cupping wird der Kaffee laut geschluerft, um ihn breit ueber die Zunge zu verteilen.",
+  "a": true,
+  "fb": "Das <b>Schluerfen</b> verteilt den Kaffee und retronasale Aromen."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "gap",
+  "q": "Der Geruch des trockenen, gemahlenen Kaffees beim Cupping heisst ___.",
+  "a": [
+   "Fragrance",
+   "Duft"
+  ],
+  "fb": "<b>Fragrance</b> = trockener Duft; <b>Aroma</b> = nasser Geruch nach dem Aufguss."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff ist KEIN klassisches Cupping-Attribut?",
+  "opts": [
+   "Sweetness",
+   "Balance",
+   "Overall",
+   "Crema"
+  ],
+  "c": 3,
+  "fb": "<b>Crema</b> ist ein Espresso-Phaenomen, kein Cupping-Score-Attribut."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wie heisst der nasse Geruch nach dem Aufgiessen beim Cupping?",
+  "opts": [
+   "Fragrance",
+   "Aroma",
+   "Body",
+   "Flavor"
+  ],
+  "c": 1,
+  "fb": "<b>Aroma</b> ist der Geruch des nassen Kaffees; Fragrance der trockene."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "gap",
+  "q": "Die Gesamtnote fuer den persoenlichen Gesamteindruck im Cupping heisst ___.",
+  "a": [
+   "Overall",
+   "Gesamteindruck"
+  ],
+  "fb": "<b>Overall</b> bewertet den subjektiven Gesamteindruck der Verkostung."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welcher Schritt gehoert NICHT zum Cupping?",
+  "opts": [
+   "Fragrance riechen",
+   "Kruste brechen",
+   "Schluerfen",
+   "Tampern"
+  ],
+  "c": 3,
+  "fb": "<b>Tampern</b> gehoert zur Espresso-Zubereitung."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 1,
+  "ty": "est",
+  "q": "Bei welcher Bohnentemperatur tritt der 'First Crack' typischerweise auf (Grad C)?",
+  "min": 170,
+  "max": 230,
+  "step": 1,
+  "ans": 196,
+  "tol": 6,
+  "unit": "Grad C",
+  "fb": "Der First Crack liegt bei etwa <b>196 Grad C</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "est",
+  "q": "Bei welcher Bohnentemperatur tritt der 'Second Crack' typischerweise auf (Grad C)?",
+  "min": 200,
+  "max": 250,
+  "step": 1,
+  "ans": 224,
+  "tol": 6,
+  "unit": "Grad C",
+  "fb": "Der Second Crack liegt bei etwa <b>224 Grad C</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Reaktion ist hauptverantwortlich fuer Braeunung und Roestaromen?",
+  "opts": [
+   "Maillard-Reaktion",
+   "Photosynthese",
+   "Fermentation",
+   "Hydrolyse"
+  ],
+  "c": 0,
+  "fb": "Die <b>Maillard-Reaktion</b> erzeugt Braeunung und viele Roestaromen."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 1,
+  "ty": "tf",
+  "q": "Helle Roestungen betonen tendenziell Saeure und fruchtige Noten.",
+  "a": true,
+  "fb": "<b>Helle Roestungen</b> bewahren mehr Saeure und Herkunftsnoten."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "tf",
+  "q": "Dunkle Roestungen sind meist bitterer und koerperreicher, mit weniger Saeure.",
+  "a": true,
+  "fb": "Laengeres Roesten baut Saeuren ab und betont <b>Bitterkeit / Koerper</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die Zeit zwischen First Crack und Roestende heisst ___ (englischer Fachbegriff).",
+  "a": [
+   "Development Time",
+   "Development",
+   "Entwicklungszeit"
+  ],
+  "fb": "Die <b>Development Time</b> nach dem First Crack praegt Suesse und Balance."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 3,
+  "ty": "mc",
+  "q": "Wofuer dient die Agtron-Skala?",
+  "opts": [
+   "Messung der Wasserhaerte",
+   "Messung des Roestgrades ueber Farbe",
+   "Bewertung der Saeure",
+   "Messung der Extraktion"
+  ],
+  "c": 1,
+  "fb": "Die <b>Agtron-Skala</b> misst den Roestgrad anhand der Farbe (hoehere Zahl = heller)."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "order",
+  "q": "Bringe die Roestphasen in die richtige Reihenfolge.",
+  "items": [
+   "Trocknungsphase",
+   "Maillard-Phase",
+   "First Crack",
+   "Development",
+   "Second Crack"
+  ],
+  "fb": "Trocknen, Maillard, First Crack, Entwicklung, ggf. Second Crack."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zur Roestung?",
+  "opts": [
+   "First Crack",
+   "Development Time",
+   "Maillard",
+   "Crust break"
+  ],
+  "c": 3,
+  "fb": "<b>Crust break</b> gehoert zum Cupping, nicht zur Roestung."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 3,
+  "ty": "flip",
+  "front": "Was passiert grob beim First Crack?",
+  "reveal": "Wasserdampf und CO2 sprengen die Zellstruktur der Bohne hoerbar auf; die Bohne dehnt sich aus - Beginn der eigentlichen Entwicklung."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Roestgrad und typische Eigenschaft zu.",
+  "pairs": [
+   [
+    "Helle Roestung",
+    "mehr Saeure, fruchtig"
+   ],
+   [
+    "Mittlere Roestung",
+    "ausgewogen, mehr Suesse"
+   ],
+   [
+    "Dunkle Roestung",
+    "bitter, koerperreich, Roestnoten"
+   ]
+  ],
+  "fb": "Mit dunklerem Roestgrad steigen Bitterkeit und Koerper."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welcher Crack kommt temperaturmaessig zuerst?",
+  "opts": [
+   "First Crack",
+   "Second Crack",
+   "Beide gleichzeitig",
+   "Third Crack"
+  ],
+  "c": 0,
+  "fb": "Der <b>First Crack</b> (~196 Grad C) liegt vor dem Second Crack (~224 Grad C)."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Was geschieht in der Trocknungsphase zu Beginn der Roestung?",
+  "opts": [
+   "Bohnen geben Restfeuchte ab",
+   "Second Crack startet",
+   "Oele treten an die Oberflaeche",
+   "Bohnen werden dunkel"
+  ],
+  "c": 0,
+  "fb": "In der <b>Trocknungsphase</b> verliert die Bohne zunaechst Wasser."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 3,
+  "ty": "tf",
+  "q": "Eine laengere Development Time kann Saeure abbauen und Suesse / Koerper betonen.",
+  "a": true,
+  "fb": "Mehr Entwicklung nach dem First Crack senkt Saeure und betont Suesse und Koerper."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "est",
+  "q": "Welche Gesamthaerte (Calcium) gibt die SCA als Zielwert an (ppm CaCO3)?",
+  "min": 0,
+  "max": 200,
+  "step": 1,
+  "ans": 68,
+  "tol": 15,
+  "unit": "ppm",
+  "fb": "Der Zielwert liegt bei etwa <b>68 ppm</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "est",
+  "q": "Welche Alkalinitaet empfiehlt die SCA als Zielwert (ppm CaCO3)?",
+  "min": 0,
+  "max": 120,
+  "step": 5,
+  "ans": 40,
+  "tol": 10,
+  "unit": "ppm",
+  "fb": "Die Ziel-Alkalinitaet liegt bei etwa <b>40 ppm</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 1,
+  "ty": "est",
+  "q": "Welcher pH-Wert gilt fuer Bruehwasser als ideal (neutral)?",
+  "min": 5,
+  "max": 9,
+  "step": 0.1,
+  "ans": 7,
+  "tol": 0.5,
+  "unit": "pH",
+  "fb": "Neutraler pH <b>7</b> ist ideal."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche grobe Spanne nennt die SCA fuer akzeptable Gesamthaerte?",
+  "opts": [
+   "0-10 ppm",
+   "ca. 50-175 ppm",
+   "300-500 ppm",
+   "ueber 600 ppm"
+  ],
+  "c": 1,
+  "fb": "Akzeptable Gesamthaerte liegt grob bei <b>50-175 ppm</b> (Ziel ~68 ppm)."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Rolle spielt Alkalinitaet (Bikarbonat) beim Bruehen?",
+  "opts": [
+   "Sie hat keinen Einfluss",
+   "Sie puffert Saeuren und beeinflusst die wahrgenommene Saeure",
+   "Sie erhoeht die Crema",
+   "Sie senkt immer die Extraktion"
+  ],
+  "c": 1,
+  "fb": "<b>Alkalinitaet</b> puffert Saeuren; zu viel macht den Kaffee flach."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 1,
+  "ty": "tf",
+  "q": "Komplett entmineralisiertes Wasser (0 ppm) extrahiert Kaffee meist schlechter.",
+  "a": true,
+  "fb": "Mineralien (v. a. Magnesium / Calcium) foerdern die <b>Extraktion</b>; reines Wasser unterextrahiert oft."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "gap",
+  "q": "Mineralien wie Magnesium und Calcium beeinflussen die ___ des Kaffees positiv.",
+  "a": [
+   "Extraktion",
+   "Extraction"
+  ],
+  "fb": "Sie binden Aromastoffe und verbessern die <b>Extraktion</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 3,
+  "ty": "odd",
+  "q": "Welcher Wert gehoert NICHT zum SCA-Wasserstandard?",
+  "opts": [
+   "Gesamthaerte",
+   "Alkalinitaet",
+   "pH",
+   "Mahlgrad"
+  ],
+  "c": 3,
+  "fb": "<b>Mahlgrad</b> ist kein Wasserparameter."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 3,
+  "ty": "flip",
+  "front": "Warum ist hartes Wasser ein Kompromiss fuer Espressomaschinen?",
+  "reveal": "Etwas Haerte hilft der Extraktion und dem Geschmack, aber zu viel Calcium fuehrt zu Kalkablagerungen und Schaeden."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welcher pH-Wert gilt als neutral und ideal fuer Bruehwasser?",
+  "opts": [
+   "pH 4",
+   "pH 5,5",
+   "pH 7",
+   "pH 9"
+  ],
+  "c": 2,
+  "fb": "<b>pH 7</b> ist neutral und der Zielwert."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "tf",
+  "q": "Sehr hohe Alkalinitaet kann Kaffee flach und stumpf schmecken lassen.",
+  "a": true,
+  "fb": "Zu hohe Pufferung daempft die wahrnehmbare <b>Saeure</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Nenne drei Wasserparameter aus dem SCA-Wasserstandard.",
+  "hint": "Haerte, Alkalinitaet, pH",
+  "model": "Gesamthaerte (~68 ppm), Alkalinitaet (~40 ppm) und pH (~7); zusaetzlich der TDS-Zielbereich."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Art enthaelt im Schnitt deutlich mehr Koffein?",
+  "opts": [
+   "Arabica",
+   "Robusta",
+   "Beide gleich",
+   "Liberica nie"
+  ],
+  "c": 1,
+  "fb": "<b>Robusta</b> hat im Schnitt etwa doppelt so viel Koffein wie Arabica."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "tf",
+  "q": "Arabica gilt geschmacklich meist als feiner / saeurebetonter als Robusta.",
+  "a": true,
+  "fb": "<b>Arabica</b> ist meist komplexer und saeurebetonter; Robusta erdiger / bitterer."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Aufbereitung und Kurzbeschreibung zu.",
+  "pairs": [
+   [
+    "Washed",
+    "Fruchtfleisch entfernt, fermentiert / gewaschen, klar"
+   ],
+   [
+    "Natural",
+    "ganze Kirsche getrocknet, fruchtig"
+   ],
+   [
+    "Honey",
+    "teilweise Fruchtfleisch belassen, suess / rund"
+   ]
+  ],
+  "fb": "Die Aufbereitung praegt das Tassenprofil deutlich."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wofuer steht die Abkuerzung SHB bei Kaffee?",
+  "opts": [
+   "Super Hard Bean (Hochlandkaffee)",
+   "Special Honey Blend",
+   "Single Harvest Batch",
+   "Slow Heat Brew"
+  ],
+  "c": 0,
+  "fb": "<b>SHB</b> = Strictly / Super Hard Bean, Kaffee aus grosser Hoehe mit dichter Bohne."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche der folgenden sind Arabica-Varietaeten?",
+  "opts": [
+   "Bourbon",
+   "Typica",
+   "Geisha",
+   "Robusta",
+   "Canephora"
+  ],
+  "c": [
+   0,
+   1,
+   2
+  ],
+  "fb": "<b>Bourbon, Typica, Geisha</b> sind Arabica-Varietaeten; Robusta / Canephora sind eine eigene Art."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 3,
+  "ty": "order",
+  "q": "Ordne den Aufbau der Kaffeekirsche von aussen nach innen.",
+  "items": [
+   "Haut (Exokarp)",
+   "Fruchtfleisch (Mesokarp)",
+   "Pergamenthaut (Endokarp)",
+   "Silberhaeutchen",
+   "Bohne (Samen)"
+  ],
+  "fb": "Von der Haut bis zum Samen im Inneren."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "tf",
+  "q": "Hoehenlage kann die Bohnendichte und Saeure / Komplexitaet beeinflussen.",
+  "a": true,
+  "fb": "Groessere <b>Hoehe</b> fuehrt oft zu dichteren Bohnen mit komplexerer Saeure."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "gap",
+  "q": "Bei der ___-Aufbereitung wird die ganze Kirsche samt Fruchtfleisch getrocknet.",
+  "a": [
+   "Natural",
+   "natuerlichen",
+   "Natur"
+  ],
+  "fb": "<b>Natural</b> liefert oft fruchtige, intensive Profile."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welche ist KEINE Aufbereitungsmethode?",
+  "opts": [
+   "Washed",
+   "Natural",
+   "Honey",
+   "Bourbon"
+  ],
+  "c": 3,
+  "fb": "<b>Bourbon</b> ist eine Varietaet, keine Aufbereitung."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 3,
+  "ty": "flip",
+  "front": "Worin unterscheiden sich Washed und Natural geschmacklich grob?",
+  "reveal": "Washed wirkt klarer, sauberer und saeurebetonter; Natural meist fruchtiger, suesser und schwerer im Koerper."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Varietaet ist fuer florale, teeartige Profile besonders bekannt?",
+  "opts": [
+   "Geisha",
+   "Robusta",
+   "Catimor",
+   "Liberica"
+  ],
+  "c": 0,
+  "fb": "<b>Geisha</b> (Gesha) ist fuer florale, jasminartige Noten beruehmt."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Aufbereitung gilt als am 'saubersten' / klarsten im Tassenprofil?",
+  "opts": [
+   "Natural",
+   "Honey",
+   "Washed",
+   "Monsooned"
+  ],
+  "c": 2,
+  "fb": "<b>Washed</b> liefert meist das klarste, sauberste Profil."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "tf",
+  "q": "Robusta wird oft in niedrigeren Hoehen angebaut als hochwertiger Arabica.",
+  "a": true,
+  "fb": "<b>Robusta</b> ist robuster und waechst gut in niedrigeren, waermeren Lagen."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Aussagen ueber Arabica vs. Robusta stimmen?",
+  "opts": [
+   "Robusta hat mehr Koffein",
+   "Arabica waechst oft hoeher",
+   "Robusta ist meist bitterer / erdiger",
+   "Arabica hat immer 0 Koffein",
+   "Robusta ist krankheitsresistenter"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Arabica: hoeher, feiner, weniger Koffein. Robusta: mehr Koffein, robuster, erdiger."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "est",
+  "q": "Welche Probengroesse nutzt das SCA Green Grading (Gramm Rohkaffee)?",
+  "min": 100,
+  "max": 500,
+  "step": 10,
+  "ans": 350,
+  "tol": 20,
+  "unit": "g",
+  "fb": "Die Standard-Probengroesse ist <b>350 g</b> Rohkaffee."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "est",
+  "q": "Welche Restfeuchte gilt fuer Rohkaffee als ueblicher Zielbereich (Mittelwert, %)?",
+  "min": 8,
+  "max": 14,
+  "step": 0.5,
+  "ans": 11,
+  "tol": 1,
+  "unit": "%",
+  "fb": "Ueblich sind etwa <b>10-12 %</b> Restfeuchte."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wie viele primaere Defekte darf Specialty-Rohkaffee enthalten?",
+  "opts": [
+   "0",
+   "bis 5",
+   "bis 10",
+   "beliebig"
+  ],
+  "c": 0,
+  "fb": "Specialty erlaubt <b>0 primaere Defekte</b> in der Probe."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 3,
+  "ty": "mc",
+  "q": "Wie viele 'Full Defects' sind fuer Specialty maximal erlaubt?",
+  "opts": [
+   "0",
+   "hoechstens 5",
+   "hoechstens 15",
+   "hoechstens 30"
+  ],
+  "c": 1,
+  "fb": "Specialty erlaubt <b>maximal 5 Full Defects</b> und 0 primaere Defekte."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "tf",
+  "q": "Im Green Grading unterscheidet man primaere und sekundaere Defekte.",
+  "a": true,
+  "fb": "<b>Primaere</b> Defekte wiegen schwerer als <b>sekundaere</b> Defekte."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Defekt und Kategorie zu.",
+  "pairs": [
+   [
+    "Voll schwarze Bohne",
+    "primaerer Defekt"
+   ],
+   [
+    "Voll saure Bohne",
+    "primaerer Defekt"
+   ],
+   [
+    "Bruchstueck / Broken",
+    "sekundaerer Defekt"
+   ],
+   [
+    "Verfaerbte (faded) Bohne",
+    "sekundaerer Defekt"
+   ]
+  ],
+  "fb": "Schwarze und saure Bohnen zaehlen als primaer, Bruch und Verfaerbung eher sekundaer."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zum Green Grading?",
+  "opts": [
+   "Primaere Defekte",
+   "Full Defects",
+   "Restfeuchte",
+   "Crust break"
+  ],
+  "c": 3,
+  "fb": "<b>Crust break</b> gehoert zum Cupping."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "gap",
+  "q": "Rohkaffee wird vor der Defektbewertung auf die richtige ___ geprueft (meist ~10-12 %).",
+  "a": [
+   "Feuchte",
+   "Restfeuchte",
+   "Feuchtigkeit"
+  ],
+  "fb": "Die <b>Restfeuchte</b> sollte fuer Lagerstabilitaet etwa 10-12 % betragen."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 3,
+  "ty": "flip",
+  "front": "Warum ist die Restfeuchte von Rohkaffee wichtig?",
+  "reveal": "Zu hohe Feuchte beguenstigt Schimmel / Fermentation, zu niedrige fuehrt zu Austrocknung - beides mindert Qualitaet und Lagerfaehigkeit."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 1,
+  "ty": "tf",
+  "q": "Specialty-Kaffee darf keine primaeren Defekte enthalten.",
+  "a": true,
+  "fb": "<b>0 primaere Defekte</b> sind Voraussetzung fuer Specialty."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 3,
+  "ty": "est",
+  "q": "Wie viele 'Full Defects' sind fuer Specialty maximal zulaessig (Zahl)?",
+  "min": 0,
+  "max": 20,
+  "step": 1,
+  "ans": 5,
+  "tol": 0,
+  "unit": "Defekte",
+  "fb": "Maximal <b>5 Full Defects</b> sind erlaubt."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 1,
+  "ty": "est",
+  "q": "In welchem Jahr fusionierten SCAA und SCAE zur SCA?",
+  "min": 2000,
+  "max": 2025,
+  "step": 1,
+  "ans": 2017,
+  "tol": 0,
+  "unit": "Jahr",
+  "fb": "Die SCA entstand <b>2017</b> aus der Fusion."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "mc",
+  "q": "Woraus entstand die SCA?",
+  "opts": [
+   "SCAA + SCAE",
+   "ICO + SCAA",
+   "WCR + SCAE",
+   "SCAA allein"
+  ],
+  "c": 0,
+  "fb": "Die <b>SCA</b> entstand 2017 aus der Fusion von SCAA und SCAE."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "mc",
+  "q": "Was ist ein 'Q-Grader'?",
+  "opts": [
+   "Ein Roestmeister",
+   "Ein zertifizierter Kaffee-Sensoriker / Verkoster",
+   "Ein Maschinen-Techniker",
+   "Ein Anbaustandard"
+  ],
+  "c": 1,
+  "fb": "Ein <b>Q-Grader</b> ist ein lizenzierter Verkoster, der Kaffeequalitaet nach Protokoll bewertet."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne die 'Drei Wellen des Kaffees' chronologisch.",
+  "items": [
+   "Erste Welle (Massenkaffee / Verbreitung)",
+   "Zweite Welle (Coffee-Shops / Espresso-Kultur)",
+   "Dritte Welle (Specialty / Herkunft & Handwerk)"
+  ],
+  "fb": "Von Massenkaffee ueber Cafe-Kultur zu Specialty."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "gap",
+  "q": "Das geografische Anbauguertel-Band rund um den Aequator heisst ___ (englisch).",
+  "a": [
+   "Coffee Belt",
+   "Bean Belt",
+   "Kaffeeguertel"
+  ],
+  "fb": "Der <b>Coffee Belt</b> (Bean Belt) liegt grob zwischen den Wendekreisen."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 1,
+  "ty": "tf",
+  "q": "Die 'Dritte Welle' betont Herkunft, Transparenz und handwerkliche Zubereitung.",
+  "a": true,
+  "fb": "Die <b>Dritte Welle</b> behandelt Kaffee aehnlich wie Wein: Herkunft und Handwerk im Fokus."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Aufgabe hat die SCA u. a.?",
+  "opts": [
+   "Kaffee anbauen",
+   "Standards, Bildung und Zertifizierungen rund um Specialty Coffee",
+   "Kaffee exportieren",
+   "Maschinen herstellen"
+  ],
+  "c": 1,
+  "fb": "Die <b>SCA</b> entwickelt Standards, Bildungsprogramme und Zertifizierungen."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT zur SCA-Organisation?",
+  "opts": [
+   "Q-Grader",
+   "Cupping-Protokoll",
+   "Brewing Control Chart",
+   "Maillard-Reaktion"
+  ],
+  "c": 3,
+  "fb": "Die <b>Maillard-Reaktion</b> ist Chemie der Roestung - kein SCA-Organisationsbegriff."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 3,
+  "ty": "flip",
+  "front": "Was kennzeichnet die 'Dritte Welle' gegenueber der zweiten?",
+  "reveal": "Staerkerer Fokus auf Einzelherkuenfte, Transparenz, schonende Roestung und praezise, oft helle Zubereitung statt reiner Cafe-Kultur."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wofuer steht die Abkuerzung SCA?",
+  "opts": [
+   "Specialty Coffee Association",
+   "Standard Coffee Agency",
+   "Strong Coffee Alliance",
+   "Sustainable Coffee Act"
+  ],
+  "c": 0,
+  "fb": "<b>SCA</b> = Specialty Coffee Association."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Nenne die drei Wellen des Kaffees in Stichworten.",
+  "hint": "Masse, Cafe, Specialty",
+  "model": "Erste Welle: Massenkonsum / Verbreitung. Zweite Welle: Cafe- und Espresso-Kultur. Dritte Welle: Specialty, Herkunft und Handwerk."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "est",
+  "q": "In welchem Jahr wurde das ueberarbeitete SCA/WCR Coffee Taster's Flavor Wheel veroeffentlicht?",
+  "min": 1990,
+  "max": 2025,
+  "step": 1,
+  "ans": 2016,
+  "tol": 0,
+  "unit": "Jahr",
+  "fb": "Das ueberarbeitete Flavor Wheel erschien <b>2016</b>."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Mit welcher Organisation wurde das Aromarad 2016 ueberarbeitet?",
+  "opts": [
+   "World Coffee Research (WCR)",
+   "ICO",
+   "Fairtrade",
+   "UTZ"
+  ],
+  "c": 0,
+  "fb": "Das ueberarbeitete <b>Flavor Wheel</b> entstand 2016 mit der World Coffee Research."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "est",
+  "q": "Aus welchem Jahr stammt das urspruengliche (erste) SCAA-Aromarad?",
+  "min": 1980,
+  "max": 2010,
+  "step": 1,
+  "ans": 1995,
+  "tol": 0,
+  "unit": "Jahr",
+  "fb": "Das urspruengliche Aromarad stammt von <b>1995</b>."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Wie liest man das Aromarad typischerweise?",
+  "opts": [
+   "Von aussen nach innen, vom Spezifischen zum Allgemeinen",
+   "Von innen nach aussen, vom Allgemeinen zum Spezifischen",
+   "Nur im Uhrzeigersinn",
+   "Es hat keine Struktur"
+  ],
+  "c": 1,
+  "fb": "Von <b>innen (allgemein) nach aussen (spezifisch)</b>, z. B. Frucht zu Beere zu Erdbeere."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Aromakategorie und Beispiel zu.",
+  "pairs": [
+   [
+    "Fruchtig",
+    "Beere / Zitrus"
+   ],
+   [
+    "Floral",
+    "Jasmin / Rose"
+   ],
+   [
+    "Nussig / Kakao",
+    "Mandel / Schokolade"
+   ],
+   [
+    "Wuerzig",
+    "Zimt / Nelke"
+   ]
+  ],
+  "fb": "Die Hauptkategorien fassen verwandte Aromen zusammen."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welches ist ein typisches FEHLAROMA (Off-Flavor)?",
+  "opts": [
+   "Karamell",
+   "Erdig / muffig",
+   "Schokolade",
+   "Beere"
+  ],
+  "c": 1,
+  "fb": "<b>Erdig / muffig</b> gilt als Fehlaroma; die anderen sind erwuenschte Noten."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche der folgenden gelten als Fehlaromen?",
+  "opts": [
+   "Gummiartig",
+   "Fermentiert (ueberfermentiert)",
+   "Erdig",
+   "Blumig",
+   "Baker / papierig"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "<b>Gummiartig, ueberfermentiert, erdig, papierig</b> sind Fehlaromen; blumig ist erwuenscht."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "gap",
+  "q": "Das offizielle SCA-Werkzeug zur Beschreibung von Kaffeearomen heisst Coffee Taster's ___ Wheel.",
+  "a": [
+   "Flavor",
+   "Flavour",
+   "Aroma"
+  ],
+  "fb": "Das <b>Coffee Taster's Flavor Wheel</b> ordnet Aromen hierarchisch."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "tf",
+  "q": "Das innere Zentrum des Aromarads enthaelt die allgemeinsten Kategorien.",
+  "a": true,
+  "fb": "Innen stehen die <b>allgemeinen</b> Kategorien, aussen die spezifischen Aromen."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Beschreibung gehoert am ehesten zu 'Saeure' (Acidity) positiv?",
+  "opts": [
+   "lebendig, zitrusartig, hell",
+   "muffig, dumpf",
+   "ranzig, oelig",
+   "aschig"
+  ],
+  "c": 0,
+  "fb": "Positive <b>Saeure</b> wird als lebendig, hell, zitrus- oder apfelartig beschrieben."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wie beschreibt man 'Body' (Koerper) sinnvoll?",
+  "opts": [
+   "leicht / teeartig bis schwer / sirupartig",
+   "sauer bis suess",
+   "hell bis dunkel geroestet",
+   "frisch bis alt"
+  ],
+  "c": 0,
+  "fb": "<b>Body</b> beschreibt das Mundgefuehl: von leicht / teeartig bis schwer / sirupartig."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Fehlaroma und moegliche Ursache zu.",
+  "pairs": [
+   [
+    "Fermentiert / weinig-ueberreif",
+    "ueberlange / falsche Fermentation"
+   ],
+   [
+    "Erdig / muffig",
+    "schlechte Trocknung / Lagerung"
+   ],
+   [
+    "Gummiartig",
+    "oft Robusta / Verarbeitungsfehler"
+   ],
+   [
+    "Baker / papierig",
+    "alter / ueberlagerter Kaffee"
+   ]
+  ],
+  "fb": "Fehlaromen lassen oft auf konkrete Prozessfehler schliessen."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welcher Begriff beschreibt KEINE Suesse- oder Frucht-Note?",
+  "opts": [
+   "Karamell",
+   "Honig",
+   "Beere",
+   "Aschig"
+  ],
+  "c": 3,
+  "fb": "<b>Aschig</b> ist eine Roest- oder Fehlnote, keine Suesse / Frucht."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Kategorie passt zu 'Zitrone, Apfel, Beere'?",
+  "opts": [
+   "Floral",
+   "Fruchtig",
+   "Wuerzig",
+   "Geroestet"
+  ],
+  "c": 1,
+  "fb": "Diese gehoeren zur Kategorie <b>Fruchtig</b>."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "odd",
+  "q": "Welcher Begriff gehoert NICHT in die Kategorie 'Geroestet'?",
+  "opts": [
+   "Rauchig",
+   "Getreidig / malzig",
+   "Jasmin",
+   "Tabak"
+  ],
+  "c": 2,
+  "fb": "<b>Jasmin</b> ist floral, nicht geroestet."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "gap",
+  "q": "Eine ueberfermentierte, weinig-faulige Note bezeichnet man als ___ Fehlaroma.",
+  "a": [
+   "fermentiert",
+   "fermentiertes",
+   "ueberfermentiert"
+  ],
+  "fb": "<b>Fermentiert</b> (ueberfermentiert) entsteht durch falsche oder zu lange Fermentation."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "flip",
+  "front": "Wozu dient das Coffee Taster's Flavor Wheel in der Praxis?",
+  "reveal": "Es gibt Verkostern eine gemeinsame, hierarchische Sprache, um Aromen vom Allgemeinen zum Spezifischen praezise und vergleichbar zu beschreiben."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "tf",
+  "q": "Das Aromarad wurde gemeinsam mit einem Sensorik-Lexikon (WCR Sensory Lexicon) wissenschaftlich fundiert.",
+  "a": true,
+  "fb": "Die Ueberarbeitung 2016 stuetzte sich auf das <b>WCR Sensory Lexicon</b>."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Note ist eine typische ERWUENSCHTE Suesse-Beschreibung?",
+  "opts": [
+   "Karamell",
+   "Gummi",
+   "Erdig",
+   "Aschig"
+  ],
+  "c": 0,
+  "fb": "<b>Karamell</b> ist eine erwuenschte Suesse- / Zucker-Note."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Kategorien sind tatsaechlich Hauptkategorien des Flavor Wheels?",
+  "opts": [
+   "Fruity",
+   "Floral",
+   "Roasted",
+   "Sour / Fermented",
+   "Maschinenmarke",
+   "Spices"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3,
+   5
+  ],
+  "fb": "Hauptkategorien sind u. a. Fruity, Floral, Roasted, Sour/Fermented, Spices - nicht 'Maschinenmarke'."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne vom allgemeinen zum spezifischen Begriff im Aromarad.",
+  "items": [
+   "Fruchtig",
+   "Beere",
+   "Erdbeere"
+  ],
+  "fb": "Innen allgemein (Fruchtig), aussen spezifisch (Erdbeere)."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "recall",
+  "prompt": "Nenne drei Hauptkategorien des Coffee Taster's Flavor Wheel.",
+  "hint": "z. B. Frucht, Blume, Roestung",
+  "model": "Zum Beispiel Fruity (fruchtig), Floral (floral) und Roasted (geroestet); weitere sind Sweet, Nutty/Cocoa, Spices, Sour/Fermented."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Note deutet eher auf einen Verarbeitungsfehler hin?",
+  "opts": [
+   "Schokolade",
+   "Gummiartig",
+   "Karamell",
+   "Zitrus"
+  ],
+  "c": 1,
+  "fb": "<b>Gummiartig</b> deutet oft auf verarbeitungs- oder Robusta-bedingte Fehlnoten hin."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "tf",
+  "q": "Das Coffee Taster's Flavor Wheel hilft, Aromen einheitlich zu benennen.",
+  "a": true,
+  "fb": "Es schafft eine <b>gemeinsame Sprache</b> fuer die Sensorik."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "odd",
+  "q": "Welche Beschreibung passt NICHT zu 'Koerper' (Body)?",
+  "opts": [
+   "sirupartig",
+   "teeartig",
+   "vollmundig",
+   "zitrusartig"
+  ],
+  "c": 3,
+  "fb": "<b>Zitrusartig</b> beschreibt Saeure, nicht den Koerper."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Einwaage und Output passen zu einer 1:2-Ratio?",
+  "opts": [
+   "20 g -> 60 g",
+   "18 g -> 36 g",
+   "18 g -> 18 g",
+   "10 g -> 50 g"
+  ],
+  "c": 1,
+  "fb": "18 g zu 36 g entspricht genau <b>1:2</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Aenderung senkt bei sonst gleichen Parametern die Extraktion am direktesten?",
+  "opts": [
+   "Feinerer Mahlgrad",
+   "Hoehere Temperatur",
+   "Groeberer Mahlgrad",
+   "Laengere Bruehzeit"
+  ],
+  "c": 2,
+  "fb": "Ein <b>groeberer Mahlgrad</b> reduziert Oberflaeche und Widerstand und damit die Extraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welcher Fehler fuehrt typischerweise zu einem 'lauten Kreischen' beim Milchschaeumen?",
+  "opts": [
+   "Lanze zu tief eingetaucht",
+   "Lanze zu weit an der Oberflaeche / zu viel Luft",
+   "Zu kalte Milch",
+   "Zu volle Kanne"
+  ],
+  "c": 1,
+  "fb": "Steht die Lanze zu hoch, wird zu viel Luft gezogen - es kreischt und der Schaum wird grob."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 3,
+  "ty": "mc",
+  "q": "Warum eignet sich Vollmilch oft gut fuer stabilen Mikroschaum?",
+  "opts": [
+   "Wegen des Wassergehalts",
+   "Wegen Proteinen und Fett, die den Schaum stabilisieren",
+   "Weil sie kaelter ist",
+   "Weil sie mehr Laktose hat als jede Pflanzenmilch"
+  ],
+  "c": 1,
+  "fb": "<b>Proteine</b> stabilisieren die Blasen, <b>Fett</b> sorgt fuer cremige Textur."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 1,
+  "ty": "mc",
+  "q": "Was bewirkt ein feinerer Mahlgrad bei sonst gleichen Parametern?",
+  "opts": [
+   "Schnellerer Durchlauf",
+   "Langsamerer Durchlauf, mehr Extraktion",
+   "Weniger Crema",
+   "Niedrigere Temperatur"
+  ],
+  "c": 1,
+  "fb": "Feiner = mehr Widerstand = <b>langsamer</b> und meist mehr Extraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welches Phaenomen reduziert WDT primaer?",
+  "opts": [
+   "Kalk",
+   "Klumpen und ungleiche Verteilung",
+   "Statische Aufladung",
+   "Hohe Temperatur"
+  ],
+  "c": 1,
+  "fb": "<b>WDT</b> loest Klumpen auf und sorgt fuer gleichmaessige Verteilung gegen Channeling."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welches Hilfsmittel braucht man fuer chemisches Backflushing?",
+  "opts": [
+   "Blindsieb plus Reinigungspulver",
+   "Entkalker",
+   "Milchsystemreiniger",
+   "WDT-Nadeln"
+  ],
+  "c": 0,
+  "fb": "Chemisches Backflushing nutzt <b>Blindsieb und Reinigungspulver</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Was ist der 'Shower Screen' (Dusche)?",
+  "opts": [
+   "Das Sieb, das Wasser ueber den Puck verteilt",
+   "Der Wassertank",
+   "Die Dampfduese",
+   "Der Tamper"
+  ],
+  "c": 0,
+  "fb": "Der <b>Shower Screen</b> verteilt das Bruehwasser gleichmaessig ueber den Puck."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Methode liefert in der Regel den vollmundigsten, oeligsten Body?",
+  "opts": [
+   "V60",
+   "Chemex",
+   "French Press",
+   "Filtermaschine"
+  ],
+  "c": 2,
+  "fb": "Die <b>French Press</b> laesst Oele und feine Partikel durch und wirkt vollmundig."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Anpassung hilft, wenn ein Pour-over zu schnell durchlaeuft und duenn schmeckt?",
+  "opts": [
+   "Groeber mahlen",
+   "Feiner mahlen",
+   "Weniger Kaffee",
+   "Kaelteres Wasser"
+  ],
+  "c": 1,
+  "fb": "Zu schnell und duenn = unterextrahiert, also <b>feiner mahlen</b>."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Ursache passt zu 'Espresso spritzt / blubbert aus dem Siebtraeger'?",
+  "opts": [
+   "Perfekte Puck-Prep",
+   "Channeling / schlechte Verteilung",
+   "Zu grosse Dosis",
+   "Zu frische Bohnen"
+  ],
+  "c": 1,
+  "fb": "Spritzen deutet oft auf <b>Channeling</b> durch ungleiche Verteilung hin."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche schnelle Korrektur passt zu einem zu schnell laufenden, sauren Shot?",
+  "opts": [
+   "Feiner mahlen",
+   "Groeber mahlen",
+   "Weniger dosieren",
+   "Kaelter bruehen"
+  ],
+  "c": 0,
+  "fb": "Feiner mahlen erhoeht Widerstand und Extraktion - gegen Saeure."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welcher Bereich beschreibt 'ideale Staerke' (TDS) fuer Filterkaffee?",
+  "opts": [
+   "0,5-0,8 %",
+   "1,15-1,35 %",
+   "2,0-2,5 %",
+   "unter 1,0 %"
+  ],
+  "c": 1,
+  "fb": "Der ideale TDS-Bereich liegt bei <b>1,15-1,35 %</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "mc",
+  "q": "Du willst die Staerke (TDS) erhoehen, ohne die Extraktion stark zu aendern. Was tust du?",
+  "opts": [
+   "Mehr Wasser zugeben",
+   "Engere Brew Ratio (mehr Kaffee pro Wasser)",
+   "Groeber mahlen",
+   "Kuerzer bruehen"
+  ],
+  "c": 1,
+  "fb": "Eine <b>engere Ratio</b> (mehr Kaffee) erhoeht die Konzentration / TDS."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welches Attribut bewertet die Gleichmaessigkeit ueber mehrere Tassen einer Probe?",
+  "opts": [
+   "Body",
+   "Uniformity",
+   "Acidity",
+   "Flavor"
+  ],
+  "c": 1,
+  "fb": "<b>Uniformity</b> prueft, ob alle Tassen gleich schmecken."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "mc",
+  "q": "Wofuer steht das Attribut 'Clean Cup'?",
+  "opts": [
+   "Saubere Tasse / Hygiene",
+   "Abwesenheit von negativen Fehlnoten",
+   "Heller Roestgrad",
+   "Niedriger TDS"
+  ],
+  "c": 1,
+  "fb": "<b>Clean Cup</b> bewertet die Abwesenheit stoerender Off-Flavors, nicht die Tassen-Hygiene."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Was bedeutet eine niedrige Agtron-Zahl?",
+  "opts": [
+   "Heller geroestet",
+   "Dunkler geroestet",
+   "Mehr Saeure",
+   "Mehr Koffein"
+  ],
+  "c": 1,
+  "fb": "Niedrige Agtron-Zahl = <b>dunkler</b> geroestet; hohe Zahl = heller."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Aromen betont eine helle Roestung tendenziell?",
+  "opts": [
+   "Roest- / Bitternoten",
+   "Saeure und Frucht",
+   "Rauch",
+   "Asche"
+  ],
+  "c": 1,
+  "fb": "Helle Roestungen betonen <b>Saeure und Frucht</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welches Mineral traegt besonders zur Extraktionskraft des Wassers bei?",
+  "opts": [
+   "Natrium",
+   "Magnesium",
+   "Chlorid",
+   "Kalium"
+  ],
+  "c": 1,
+  "fb": "<b>Magnesium</b> bindet Aromastoffe gut und foerdert die Extraktion."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Aufbereitung liegt geschmacklich zwischen Washed und Natural?",
+  "opts": [
+   "Honey",
+   "Monsooned",
+   "Wet-Hulled",
+   "Decaf"
+  ],
+  "c": 0,
+  "fb": "Die <b>Honey</b>-Aufbereitung liegt zwischen klar (Washed) und fruchtig (Natural)."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welcher Teil der Kaffeekirsche wird letztlich geroestet?",
+  "opts": [
+   "Die Haut",
+   "Das Fruchtfleisch",
+   "Der Samen (Bohne)",
+   "Das Silberhaeutchen"
+  ],
+  "c": 2,
+  "fb": "Geroestet wird der <b>Samen</b> (die Bohne) im Inneren der Kirsche."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Bohne zaehlt als primaerer Defekt?",
+  "opts": [
+   "Bruchstueck",
+   "Voll schwarze Bohne",
+   "Leicht verfaerbte Bohne",
+   "Kleines Steinchen ohne Bohne"
+  ],
+  "c": 1,
+  "fb": "Eine <b>voll schwarze Bohne</b> ist ein primaerer (schwerer) Defekt."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "mc",
+  "q": "Wo verlaeuft der 'Coffee Belt' grob?",
+  "opts": [
+   "An den Polen",
+   "Rund um den Aequator zwischen den Wendekreisen",
+   "Nur in Suedamerika",
+   "Nur in Afrika"
+  ],
+  "c": 1,
+  "fb": "Der <b>Coffee Belt</b> liegt grob zwischen den Wendekreisen rund um den Aequator."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Welle entspricht am ehesten dem Aufstieg grosser Kaffeehausketten?",
+  "opts": [
+   "Erste Welle",
+   "Zweite Welle",
+   "Dritte Welle",
+   "Vierte Welle"
+  ],
+  "c": 1,
+  "fb": "Die <b>zweite Welle</b> brachte Espresso-Kultur und Cafe-Ketten."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "mc",
+  "q": "Welche Kategorie umfasst Noten wie Vanille, Karamell und Honig?",
+  "opts": [
+   "Sour / Fermented",
+   "Sweet (Suess)",
+   "Green / Vegetative",
+   "Roasted"
+  ],
+  "c": 1,
+  "fb": "Vanille, Karamell und Honig fallen in die Kategorie <b>Sweet</b>."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "mc",
+  "q": "Welche Kategorie deckt 'erbsig / grasig / strohig' ab?",
+  "opts": [
+   "Green / Vegetative",
+   "Floral",
+   "Nutty / Cocoa",
+   "Spices"
+  ],
+  "c": 0,
+  "fb": "<b>Green / Vegetative</b> umfasst grasige, erbsige und strohige Noten."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "mc",
+  "q": "Welche Note ist klar floral?",
+  "opts": [
+   "Jasmin",
+   "Erdnuss",
+   "Tabak",
+   "Zitrone"
+  ],
+  "c": 0,
+  "fb": "<b>Jasmin</b> ist eine typische florale Note."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Parameter beeinflussen die Espresso-Extraktion direkt?",
+  "opts": [
+   "Mahlgrad",
+   "Dosis",
+   "Bruehtemperatur",
+   "Tassenfarbe",
+   "Bruehzeit"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Mahlgrad, Dosis, Temperatur und Zeit zaehlen - die Tassenfarbe nicht."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "multi",
+  "q": "Was kennzeichnet guten Mikroschaum?",
+  "opts": [
+   "Feinporig",
+   "Glaenzend",
+   "Grobe Blasen",
+   "Fliessend / streichfaehig",
+   "Trocken und fest"
+  ],
+  "c": [
+   0,
+   1,
+   3
+  ],
+  "fb": "Guter Mikroschaum ist feinporig, glaenzend und fliessend."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Massnahmen reduzieren Channeling?",
+  "opts": [
+   "WDT",
+   "Gleichmaessiges Tampern",
+   "Schraeg tampern",
+   "Leveling vor dem Tampern",
+   "Klumpen belassen"
+  ],
+  "c": [
+   0,
+   1,
+   3
+  ],
+  "fb": "WDT, ebenes Tampern und Leveling helfen; schraeges Tampern und Klumpen schaden."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Aufgaben gehoeren zur regelmaessigen Wartung?",
+  "opts": [
+   "Backflushing",
+   "Entkalken",
+   "Dichtungen tauschen",
+   "Bohnen anbauen",
+   "Shower Screen reinigen"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Backflushing, Entkalken, Dichtungen und Reinigung gehoeren dazu - Anbau nicht."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Methoden sind Vollimmersion?",
+  "opts": [
+   "French Press",
+   "Cold Brew",
+   "V60",
+   "AeroPress (Immersionsteil)",
+   "Chemex"
+  ],
+  "c": [
+   0,
+   1,
+   3
+  ],
+  "fb": "French Press, Cold Brew und der Immersionsteil der AeroPress sind Vollimmersion."
+ },
+ {
+  "track": "barista",
+  "cat": "Troubleshooting",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Anzeichen sprechen fuer Ueberextraktion?",
+  "opts": [
+   "Bitter",
+   "Adstringierend / trocken",
+   "Sauer und duenn",
+   "Hohl / leer",
+   "Aschig"
+  ],
+  "c": [
+   0,
+   1,
+   4
+  ],
+  "fb": "Bitter, adstringierend und aschig deuten auf Ueberextraktion; sauer/duenn auf Unterextraktion."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Massnahmen koennen die Bruehzeit eines zu schnellen Shots verlaengern?",
+  "opts": [
+   "Feiner mahlen",
+   "Dosis erhoehen",
+   "Groeber mahlen",
+   "Besser verteilen / tampern",
+   "Weniger dosieren"
+  ],
+  "c": [
+   0,
+   1,
+   3
+  ],
+  "fb": "Feiner mahlen, mehr Dosis und bessere Prep erhoehen den Widerstand."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Attribute gehoeren zum klassischen SCA-Bewertungsbogen?",
+  "opts": [
+   "Fragrance/Aroma",
+   "Flavor",
+   "Acidity",
+   "Body",
+   "Maschinenmarke",
+   "Balance"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3,
+   5
+  ],
+  "fb": "Alle ausser 'Maschinenmarke' sind echte Cupping-Attribute."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Aussagen zur Roestung stimmen?",
+  "opts": [
+   "First Crack vor Second Crack",
+   "Maillard erzeugt Braeunung",
+   "Helle Roestung = mehr Saeure",
+   "Dunkle Roestung = mehr Saeure",
+   "Development Time praegt das Profil"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Dunkle Roestung hat WENIGER Saeure - die anderen Aussagen stimmen."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Parameter nennt der SCA-Wasserstandard?",
+  "opts": [
+   "Gesamthaerte",
+   "Alkalinitaet",
+   "pH",
+   "Mahlgrad",
+   "TDS"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Haerte, Alkalinitaet, pH und TDS gehoeren dazu - Mahlgrad nicht."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche sind gaengige Aufbereitungsmethoden?",
+  "opts": [
+   "Washed",
+   "Natural",
+   "Honey",
+   "Wet-Hulled",
+   "Bourbon"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "fb": "Washed, Natural, Honey und Wet-Hulled sind Aufbereitungen; Bourbon ist eine Varietaet."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 3,
+  "ty": "multi",
+  "q": "Was gehoert zu den Specialty-Kriterien im Green Grading?",
+  "opts": [
+   "0 primaere Defekte",
+   "max. 5 Full Defects",
+   "350 g Probe",
+   "Feuchte ~10-12 %",
+   "beliebige Defektzahl"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "fb": "0 primaere Defekte, max. 5 Full Defects, 350 g Probe und passende Feuchte - nicht beliebig."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Aussagen zur SCA stimmen?",
+  "opts": [
+   "Entstand 2017",
+   "Fusion aus SCAA und SCAE",
+   "Vergibt Q-Grader-Zertifizierung",
+   "Baut selbst Kaffee an",
+   "Entwickelt Standards"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Die SCA baut keinen Kaffee an - die uebrigen Aussagen stimmen."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche Aussagen zum Golden Cup stimmen?",
+  "opts": [
+   "Extraktion 18-22 %",
+   "TDS ca. 1,15-1,35 %",
+   "Beschreibt Staerke und Extraktion",
+   "Gilt nur fuer Espresso",
+   "Ist ein Zielfenster"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Der Golden Cup bezieht sich primaer auf Filterkaffee, nicht nur auf Espresso."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "multi",
+  "q": "Welche gehoeren zu den Hauptkategorien des Flavor Wheels?",
+  "opts": [
+   "Fruity",
+   "Sweet",
+   "Floral",
+   "Spices",
+   "Maschinentyp",
+   "Roasted"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   3,
+   5
+  ],
+  "fb": "Maschinentyp ist keine Aromakategorie - die uebrigen sind Hauptkategorien."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 3,
+  "ty": "multi",
+  "q": "Welche Begriffe sind klassische Fehlaromen?",
+  "opts": [
+   "Erdig",
+   "Fermentiert",
+   "Gummiartig",
+   "Schokolade",
+   "Phenolisch / medizinisch"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Erdig, fermentiert, gummiartig und phenolisch sind Fehlaromen; Schokolade ist erwuenscht."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 1,
+  "ty": "multi",
+  "q": "Welche Noten gehoeren zur Kategorie 'Fruchtig'?",
+  "opts": [
+   "Beere",
+   "Zitrus",
+   "Steinobst",
+   "Jasmin",
+   "Apfel"
+  ],
+  "c": [
+   0,
+   1,
+   2,
+   4
+  ],
+  "fb": "Beere, Zitrus, Steinobst und Apfel sind fruchtig; Jasmin ist floral."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "gap",
+  "q": "Der Standard-Bruehdruck fuer Espresso betraegt ___ bar.",
+  "a": [
+   "9",
+   "9 bar",
+   "neun"
+  ],
+  "fb": "<b>9 bar</b> sind der klassische Bruehdruck."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "gap",
+  "q": "Der feinporige Schaum fuer Latte Art heisst ___.",
+  "a": [
+   "Mikroschaum",
+   "Microfoam",
+   "Mikro-Schaum"
+  ],
+  "fb": "<b>Mikroschaum</b> ist die Grundlage guter Latte Art."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "gap",
+  "q": "Reinigen der Bruehgruppe mit Druck und Blindsieb nennt man ___ (englisch).",
+  "a": [
+   "Backflushing",
+   "Backflush",
+   "Rueckspuelen"
+  ],
+  "fb": "<b>Backflushing</b> entfernt Kaffeefett aus der Gruppe."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "gap",
+  "q": "Das Vorbenetzen des Kaffees vor dem eigentlichen Aufguss heisst ___ (englisch).",
+  "a": [
+   "Blooming",
+   "Bloom",
+   "Vorquellen"
+  ],
+  "fb": "<b>Blooming</b> laesst CO2 entweichen fuer gleichmaessige Extraktion."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die ___ misst die Stoffmenge, die ins Getraenk uebergeht (englisch: Extraction Yield).",
+  "a": [
+   "Extraktionsausbeute",
+   "Extraktion",
+   "Extraction Yield"
+  ],
+  "fb": "Die <b>Extraktionsausbeute</b> sollte etwa 18-22 % betragen."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "gap",
+  "q": "Die klassische Cupping-Einwaage betraegt ___ Gramm pro 150 ml Wasser.",
+  "a": [
+   "8,25",
+   "8.25",
+   "8,25 g",
+   "8,25g"
+  ],
+  "fb": "<b>8,25 g / 150 ml</b> entsprechen etwa 1:18,18."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "gap",
+  "q": "Der erste hoerbare Crack beim Roesten heisst ___ (englisch).",
+  "a": [
+   "First Crack",
+   "First-Crack",
+   "erster Crack"
+  ],
+  "fb": "Der <b>First Crack</b> liegt bei etwa 196 Grad C."
+ },
+ {
+  "track": "sca",
+  "cat": "Standards & Geschichte",
+  "d": 2,
+  "ty": "gap",
+  "q": "Ein zertifizierter Profi-Verkoster nach SCA-System heisst ___ .",
+  "a": [
+   "Q-Grader",
+   "Q Grader",
+   "Q-grader"
+  ],
+  "fb": "Ein <b>Q-Grader</b> bewertet Kaffee standardisiert."
+ },
+ {
+  "track": "barista",
+  "cat": "Espresso-Grundlagen",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Begriff und Beschreibung zu.",
+  "pairs": [
+   [
+    "Crema",
+    "Schaumschicht aus Oelen und CO2"
+   ],
+   [
+    "Puck",
+    "verdichtetes Kaffeemehl im Sieb"
+   ],
+   [
+    "Tamper",
+    "Werkzeug zum Verdichten"
+   ],
+   [
+    "Channeling",
+    "Wasser fliesst durch Kanaele"
+   ]
+  ],
+  "fb": "Grundbegriffe der Espresso-Zubereitung."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Latte-Art-Motiv und Schwierigkeit zu.",
+  "pairs": [
+   [
+    "Herz",
+    "Einsteiger"
+   ],
+   [
+    "Tulpe",
+    "mittel"
+   ],
+   [
+    "Rosetta",
+    "fortgeschritten"
+   ],
+   [
+    "Schwan",
+    "Profi"
+   ]
+  ],
+  "fb": "Vom einfachen Herz bis zum komplexen Schwan."
+ },
+ {
+  "track": "barista",
+  "cat": "Mahlen & Dosieren",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Symptom und Mahlgrad-Korrektur zu.",
+  "pairs": [
+   [
+    "Shot zu schnell, sauer",
+    "feiner mahlen"
+   ],
+   [
+    "Shot zu langsam, bitter",
+    "groeber mahlen"
+   ],
+   [
+    "Statische Aufladung",
+    "RDT anwenden"
+   ],
+   [
+    "Klumpen im Mehl",
+    "WDT anwenden"
+   ]
+  ],
+  "fb": "Mahlgrad und Verteilung gezielt anpassen."
+ },
+ {
+  "track": "barista",
+  "cat": "Bruehmethoden",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Methode und Merkmal zu.",
+  "pairs": [
+   [
+    "French Press",
+    "Vollimmersion, voller Body"
+   ],
+   [
+    "V60",
+    "Pour-over, klare Tasse"
+   ],
+   [
+    "AeroPress",
+    "Kolbendruck, schnell"
+   ],
+   [
+    "Cold Brew",
+    "kalt, lange Kontaktzeit"
+   ]
+  ],
+  "fb": "Jede Methode hat ein charakteristisches Profil."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Reinigung und Zweck zu.",
+  "pairs": [
+   [
+    "Backflushing",
+    "Kaffeefett aus Bruehgruppe"
+   ],
+   [
+    "Entkalken",
+    "Kalk aus Boiler / Leitungen"
+   ],
+   [
+    "Milchsystemreiniger",
+    "Milchreste aus Lanze / Schlauch"
+   ],
+   [
+    "Filtertausch",
+    "Wasserqualitaet erhalten"
+   ]
+  ],
+  "fb": "Verschiedene Reinigungen fuer verschiedene Ablagerungen."
+ },
+ {
+  "track": "sca",
+  "cat": "Extraktion & Kennzahlen",
+  "d": 3,
+  "ty": "match",
+  "q": "Ordne Kennzahl und Bedeutung zu.",
+  "pairs": [
+   [
+    "TDS",
+    "Staerke / Konzentration"
+   ],
+   [
+    "Extraktionsausbeute",
+    "geloester Anteil des Kaffees"
+   ],
+   [
+    "Brew Ratio",
+    "Kaffee zu Wasser"
+   ],
+   [
+    "Golden Cup",
+    "ideales Zielfenster"
+   ]
+  ],
+  "fb": "Die zentralen Brueh-Kennzahlen."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Cupping-Begriff und Zeitpunkt / Aktion zu.",
+  "pairs": [
+   [
+    "Fragrance",
+    "trockener Duft vor dem Aufguss"
+   ],
+   [
+    "Aroma",
+    "Geruch nach dem Aufguss"
+   ],
+   [
+    "Crust break",
+    "Kruste nach ~4 min brechen"
+   ],
+   [
+    "Schluerfen",
+    "Bewertung am Gaumen"
+   ]
+  ],
+  "fb": "Der Cupping-Ablauf in Stichworten."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Roest-Ereignis und Temperatur zu.",
+  "pairs": [
+   [
+    "First Crack",
+    "ca. 196 Grad C"
+   ],
+   [
+    "Second Crack",
+    "ca. 224 Grad C"
+   ],
+   [
+    "Trocknungsphase",
+    "Start, Wasser entweicht"
+   ],
+   [
+    "Maillard-Phase",
+    "Braeunung beginnt"
+   ]
+  ],
+  "fb": "Roestphasen und ihre groben Temperaturen."
+ },
+ {
+  "track": "sca",
+  "cat": "Wasser",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Wasserparameter und SCA-Zielwert zu.",
+  "pairs": [
+   [
+    "Gesamthaerte",
+    "ca. 68 ppm"
+   ],
+   [
+    "Alkalinitaet",
+    "ca. 40 ppm"
+   ],
+   [
+    "pH",
+    "ca. 7"
+   ],
+   [
+    "TDS",
+    "Zielbereich definiert"
+   ]
+  ],
+  "fb": "Die SCA-Wasserzielwerte im Ueberblick."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Begriff und Beschreibung zu.",
+  "pairs": [
+   [
+    "Arabica",
+    "feiner, weniger Koffein, hoehere Lagen"
+   ],
+   [
+    "Robusta",
+    "mehr Koffein, robuster, erdiger"
+   ],
+   [
+    "SHB",
+    "Hochland, dichte Bohne"
+   ],
+   [
+    "Geisha",
+    "floral, teeartig"
+   ]
+  ],
+  "fb": "Arten, Lagen und Varietaeten unterscheiden."
+ },
+ {
+  "track": "sca",
+  "cat": "Green Grading & Defekte",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Begriff und Wert zu.",
+  "pairs": [
+   [
+    "Probengroesse",
+    "350 g"
+   ],
+   [
+    "Restfeuchte",
+    "~10-12 %"
+   ],
+   [
+    "Primaere Defekte (Specialty)",
+    "0"
+   ],
+   [
+    "Full Defects (Specialty)",
+    "max. 5"
+   ]
+  ],
+  "fb": "Die wichtigsten Green-Grading-Kennzahlen."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "match",
+  "q": "Ordne Aromakategorie und Beispielnote zu.",
+  "pairs": [
+   [
+    "Sweet",
+    "Karamell / Vanille"
+   ],
+   [
+    "Nutty / Cocoa",
+    "Mandel / Schokolade"
+   ],
+   [
+    "Green / Vegetative",
+    "Gras / Erbse"
+   ],
+   [
+    "Sour / Fermented",
+    "weinig / essigartig"
+   ]
+  ],
+  "fb": "Weitere Hauptkategorien des Flavor Wheels."
+ },
+ {
+  "track": "barista",
+  "cat": "Milch & Latte Art",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne die Cappuccino-Zubereitung in sinnvolle Reihenfolge.",
+  "items": [
+   "Espresso beziehen",
+   "Milch aufschaeumen",
+   "Schaum kurz absetzen lassen",
+   "Milch eingiessen",
+   "Latte-Art-Motiv giessen"
+  ],
+  "fb": "Erst Espresso, dann Milch schaeumen und eingiessen."
+ },
+ {
+  "track": "barista",
+  "cat": "Maschine & Wartung",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne die Schritte beim chemischen Backflushing.",
+  "items": [
+   "Blindsieb einsetzen",
+   "Reinigungspulver dosieren",
+   "Mehrfach spuelen lassen",
+   "Pulver entfernen",
+   "Mit klarem Wasser nachspuelen"
+  ],
+  "fb": "Pulver, spuelen, dann gruendlich klar nachspuelen."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne nach steigender Temperatur.",
+  "items": [
+   "Trocknungsphase",
+   "First Crack (~196 Grad C)",
+   "Second Crack (~224 Grad C)"
+  ],
+  "fb": "Temperatur steigt im Roestverlauf an."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 3,
+  "ty": "order",
+  "q": "Ordne die Bewertung von der Heisstasse zur Kalttasse.",
+  "items": [
+   "Heiss: Fragrance/Aroma",
+   "Abkuehlend: Flavor & Acidity",
+   "Lauwarm: Body & Balance",
+   "Kalt: Sweetness & Overall"
+  ],
+  "fb": "Beim Abkuehlen treten verschiedene Attribute hervor."
+ },
+ {
+  "track": "sca",
+  "cat": "Anbau & Verarbeitung",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne die Verarbeitung (washed) vom Pfluecken zur Bohne.",
+  "items": [
+   "Kirschen pfluecken",
+   "Entpulpen",
+   "Fermentieren",
+   "Waschen",
+   "Trocknen"
+  ],
+  "fb": "Typischer Ablauf der gewaschenen Aufbereitung."
+ },
+ {
+  "track": "rad",
+  "cat": "Aromarad & Sensorik",
+  "d": 2,
+  "ty": "order",
+  "q": "Ordne vom allgemeinen zum spezifischen Aroma.",
+  "items": [
+   "Floral",
+   "Blume",
+   "Jasmin"
+  ],
+  "fb": "Von der Hauptkategorie zur konkreten Note."
+ },
+ {
+  "track": "sca",
+  "cat": "Cupping & Sensorik",
+  "d": 1,
+  "ty": "tf",
+  "q": "Im klassischen SCA-Cupping werden 8,25 g Kaffee auf 150 ml Wasser verwendet.",
+  "a": true,
+  "fb": "Die Standard-Einwaage ist <b>8,25 g / 150 ml</b>."
+ },
+ {
+  "track": "sca",
+  "cat": "Roestung",
+  "d": 2,
+  "ty": "tf",
+  "q": "Der Second Crack tritt bei niedrigerer Temperatur auf als der First Crack.",
+  "a": false,
+  "fb": "Der Second Crack (~224 Grad C) liegt <b>hoeher</b> als der First Crack (~196 Grad C)."
+ }
+]</script>
+<script>
+"use strict";
+const CFG = JSON.parse(document.getElementById('cfg').textContent);
+const QUESTIONS = JSON.parse(document.getElementById('qdata').textContent);
+QUESTIONS.forEach((q,i)=>{q._i=i;});
+const SESSION_LEN = 12;
+
+/* ---------- storage ---------- */
+const SK = CFG.storeKey;
+function load(){ try{return JSON.parse(localStorage.getItem(SK))||{};}catch(e){return {};} }
+function save(){ try{localStorage.setItem(SK, JSON.stringify(store));}catch(e){} }
+let store = load();
+store.xp = store.xp||0; store.sc = store.sc||0; store.sl = store.sl||"";
+store.best = store.best||{};
+
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id);}
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function sample(a,n){return shuffle(a).slice(0,n);}
+function today(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function yesterday(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function norm(s){return (s||"").toString().toLowerCase().trim()
+  .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+  .normalize("NFD").replace(/[̀-ͯ]/g,"")
+  .replace(/[^a-z0-9]/g,"");}
+function lev(a,b){var m=a.length,n=b.length,d=[];for(var i=0;i<=m;i++)d[i]=[i];for(var j=0;j<=n;j++)d[0][j]=j;
+  for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];}
+const LETTERS="ABCDE";
+
+/* ---------- header ---------- */
+function refreshHeader(){
+  $('brandTitle').innerHTML = CFG.brand;
+  $('streakStat').textContent = "🔥 "+store.sc;
+  $('xpStat').textContent = "⭐ "+store.xp;
+}
+function applyTheme(){
+  if(store.theme==='dark'){document.documentElement.setAttribute('data-theme','dark');$('themeBtn').textContent='☀️';}
+  else{document.documentElement.removeAttribute('data-theme');$('themeBtn').textContent='🌙';}
+}
+$('themeBtn').onclick=function(){store.theme=(store.theme==='dark')?'light':'dark';save();applyTheme();
+  var v=store.theme==='dark'?'dark':'light';
+  document.querySelectorAll('iframe').forEach(function(fr){ if(fr.contentWindow){try{fr.contentWindow.postMessage({type:'aromarad-theme',value:v},'*');}catch(e){}} });};
+
+/* ---------- streak ---------- */
+function bumpStreak(){
+  var t=today();
+  if(store.sl===t){} else if(store.sl===yesterday()){store.sc++;} else {store.sc=1;}
+  store.sl=t; save(); refreshHeader();
+}
+
+/* ---------- home ---------- */
+let curTrack = CFG.tracks[0].id;
+function trackColor(id){var t=CFG.tracks.find(function(x){return x.id===id;});return t?t.color:'var(--brand)';}
+function catIcon(cat){return (CFG.catIcons&&CFG.catIcons[cat])|| '📖';}
+
+function renderTabs(){
+  var w=$('tabs'); w.innerHTML='';
+  CFG.tracks.forEach(function(t){
+    var b=el('button','tab'+(t.id===curTrack?' on':''), t.emoji+' '+t.label);
+    if(t.id===curTrack){b.style.background=t.color;}
+    b.onclick=function(){curTrack=t.id;renderHome();};
+    w.appendChild(b);
+  });
+}
+function catsOf(track){
+  var map={}; var order=[];
+  QUESTIONS.forEach(function(q){ if(q.track===track){ if(!map[q.cat]){map[q.cat]=[];order.push(q.cat);} map[q.cat].push(q);} });
+  return order.map(function(c){return {cat:c,items:map[c]};});
+}
+function diffDots(items){
+  var avg=items.reduce(function(s,q){return s+(q.d||1);},0)/items.length;
+  var n=Math.round(avg); var h='<span class="dots">';
+  for(var i=1;i<=3;i++)h+='<i class="'+(i<=n?'on':'')+'"></i>';
+  return h+'</span>';
+}
+function renderHome(){
+  $('homeView').classList.remove('hidden');
+  $('quizView').classList.add('hidden');
+  $('resultView').classList.add('hidden');
+  renderTabs();
+  var col=trackColor(curTrack);
+  var tObj=CFG.tracks.find(function(x){return x.id===curTrack;});
+  var pool=QUESTIONS.filter(function(q){return q.track===curTrack;});
+  // banner: mixed for this track
+  var bs=$('bannerSlot'); bs.innerHTML='';
+  var ban=el('div','banner');
+  ban.style.background='linear-gradient(135deg,'+col+',color-mix(in srgb,'+col+' 65%, #000))';
+  ban.innerHTML='<span class="em">🎲</span><div><b>Alles gemischt</b><small>'+pool.length+' Fragen · '+tObj.label+' · zufällig & gemischt</small></div><span class="go">›</span>';
+  ban.onclick=function(){startQuiz(function(q){return q.track===curTrack;}, '🎲 '+tObj.label, col);};
+  bs.appendChild(ban);
+  // category list
+  var list=$('catList'); list.innerHTML='';
+  if(tObj.wheel){
+    list.appendChild(el('div','sectit','Aromarad — jederzeit zum Nachschlagen'));
+    var fr=el('div','wheelFrame');
+    var th=(store.theme==='dark')?'dark':'light';
+    var ifr=document.createElement('iframe');
+    ifr.id='aromaFrame'; ifr.title='Aromarad';
+    ifr.setAttribute('src',(CFG.wheelSrc||'aromarad.html')+'?theme='+th);
+    fr.appendChild(ifr); list.appendChild(fr);
+    return;
+  }
+  list.appendChild(el('div','sectit','Themen'));
+  catsOf(curTrack).forEach(function(g){
+    var b=el('button','cat');
+    b.innerHTML='<span class="ic">'+catIcon(g.cat)+'</span>'+
+      '<span class="tx"><b>'+g.cat+'</b><small>'+g.items.length+' Fragen '+diffDots(g.items)+'</small></span>'+
+      '<span class="ct">›</span>';
+    b.onclick=function(){startQuiz(function(q){return q.track===curTrack&&q.cat===g.cat;}, g.cat, col);};
+    list.appendChild(b);
+  });
+}
+
+/* ---------- quiz session ---------- */
+let S=null;
+function startQuiz(filter, label, color){
+  var pool=QUESTIONS.filter(filter);
+  var queue=sample(pool, Math.min(SESSION_LEN, pool.length));
+  S={queue:queue,pos:0,correct:0,xp:0,label:label,color:color||'var(--brand)',filter:filter};
+  $('homeView').classList.add('hidden');
+  $('resultView').classList.add('hidden');
+  $('quizView').classList.remove('hidden');
+  renderQ();
+}
+$('quizBack').onclick=function(){ if(confirm('Quiz beenden und zurück?')) renderHome(); };
+
+function setFoot(buttons){ // buttons: array of {label,cls,fn,disabled}
+  var f=$('footSlot'); f.innerHTML='';
+  buttons.forEach(function(b){
+    var btn=el('button','btn'+(b.cls?' '+b.cls:''), b.label);
+    if(b.disabled)btn.disabled=true;
+    btn.onclick=b.fn; f.appendChild(btn); b._el=btn;
+  });
+}
+function progress(){
+  $('pbarFill').style.width=((S.pos)/S.queue.length*100)+'%';
+  $('qcount').textContent=(S.pos+1)+' / '+S.queue.length;
+}
+function next(){ S.pos++; if(S.pos>=S.queue.length){finish();} else {renderQ();} }
+function nextBtn(){ var last=(S.pos+1>=S.queue.length); setFoot([{label:last?'Ergebnis ansehen':'Weiter ›',fn:next}]); }
+
+let answered=false;
+function reveal(correct, q, opts){
+  if(answered)return; answered=true;
+  opts=opts||{};
+  var gain=0;
+  if(correct){ gain = 10 + ((q.d||1)-1)*5; S.correct++; }
+  else if(opts.self){ gain=0; }
+  if(opts.self && correct){ gain = 6 + ((q.d||1)-1)*3; }
+  S.xp+=gain; store.xp+=gain; save(); refreshHeader();
+  // feedback box
+  var fb=$('cardFb');
+  if(fb){
+    fb.className='fb show '+(correct?'ok':'no');
+    var head = opts.self ? (correct?'Stark! ✓':'Beim nächsten Mal ✗') : (correct?'Richtig ✓':'Nicht ganz ✗');
+    var body = q.fb || opts.body || '';
+    fb.innerHTML='<span class="h">'+head+(gain?'  +'+gain+' XP':'')+'</span><span class="x">'+body+'</span>';
+  }
+  nextBtn();
+}
+
+function buildQ(q){
+  var k='<span class="kicker t-'+q.ty+'">'+kickerLabel(q.ty)+'</span>';
+  var card=el('div','card');
+  card.innerHTML=k;
+  var qt = q.q || q.front || q.prompt || '';
+  card.appendChild(el('div','qtext', qt));
+  return card;
+}
+function kickerLabel(ty){
+  return ({mc:'Frage',multi:'Mehrfachauswahl',tf:'Wahr oder Falsch',odd:'Ausreißer finden',
+    match:'Zuordnen',order:'Sortieren',gap:'Lückentext',est:'Schätzen',flip:'Lernkarte',recall:'Selbsttest'})[ty]||'Frage';
+}
+
+function renderQ(){
+  answered=false; progress();
+  var q=S.queue[S.pos];
+  var slot=$('cardSlot'); slot.innerHTML='';
+  var card=buildQ(q);
+  slot.appendChild(card);
+  var fb=el('div','fb'); fb.id='cardFb'; card.appendChild(fb);
+  // type-specific
+  if(q.ty==='mc'||q.ty==='odd') renderMC(q,card);
+  else if(q.ty==='multi') renderMulti(q,card);
+  else if(q.ty==='tf') renderTF(q,card);
+  else if(q.ty==='match') renderMatch(q,card);
+  else if(q.ty==='order') renderOrder(q,card);
+  else if(q.ty==='gap') renderGap(q,card);
+  else if(q.ty==='est') renderEst(q,card);
+  else if(q.ty==='flip') renderFlip(q,card);
+  else if(q.ty==='recall') renderRecall(q,card);
+  else { card.appendChild(el('div','qsub','(unbekannter Typ)')); nextBtn(); }
+  window.scrollTo(0,0);
+}
+
+/* MC + odd */
+function renderMC(q,card){
+  var wrap=el('div','opts'); card.insertBefore(wrap, $('cardFb'));
+  var idx=q.opts.map(function(_,i){return i;});
+  var order=shuffle(idx);
+  var btns=[];
+  order.forEach(function(origIdx,pos){
+    var b=el('button','opt');
+    b.innerHTML='<span class="k">'+LETTERS[pos]+'</span><span>'+q.opts[origIdx]+'</span>';
+    b.onclick=function(){
+      if(answered)return;
+      var correct = origIdx===q.c;
+      btns.forEach(function(o){o.b.disabled=true;});
+      b.classList.add(correct?'correct':'wrong');
+      if(!correct){ // also show correct one
+        btns.forEach(function(o){ if(o.origIdx===q.c) o.b.classList.add('correct'); });
+      }
+      reveal(correct,q);
+    };
+    btns.push({b:b,origIdx:origIdx}); wrap.appendChild(b);
+  });
+  setFoot([{label:'Wähle eine Antwort',fn:function(){},disabled:true}]);
+}
+
+/* multi */
+function renderMulti(q,card){
+  card.insertBefore(el('div','qsub','Mehrere Antworten richtig – wähle alle aus.'), $('cardFb'));
+  var wrap=el('div','opts'); card.insertBefore(wrap, $('cardFb'));
+  var order=shuffle(q.opts.map(function(_,i){return i;}));
+  var sel={};
+  var btns=[];
+  order.forEach(function(origIdx,pos){
+    var b=el('button','opt');
+    b.innerHTML='<span class="k">'+LETTERS[pos]+'</span><span>'+q.opts[origIdx]+'</span>';
+    b.onclick=function(){ if(answered)return; sel[origIdx]=!sel[origIdx]; b.classList.toggle('sel',sel[origIdx]); updateFoot(); };
+    btns.push({b:b,origIdx:origIdx}); wrap.appendChild(b);
+  });
+  function ready(){return Object.keys(sel).filter(function(k){return sel[k];}).length>0;}
+  function updateFoot(){ if(S._mf)S._mf.disabled=!ready(); }
+  function check(){
+    if(answered)return;
+    var picked=Object.keys(sel).filter(function(k){return sel[k];}).map(Number).sort();
+    var corr=q.c.slice().sort();
+    var ok = picked.length===corr.length && picked.every(function(v,i){return v===corr[i];});
+    btns.forEach(function(o){
+      var isC=q.c.indexOf(o.origIdx)>=0, isP=!!sel[o.origIdx];
+      o.b.disabled=true; o.b.classList.remove('sel');
+      if(isC) o.b.classList.add('correct');
+      else if(isP) o.b.classList.add('wrong');
+    });
+    reveal(ok,q);
+  }
+  setFoot([{label:'Prüfen',fn:check,disabled:true}]); S._mf=$('footSlot').firstChild;
+}
+
+/* true/false */
+function renderTF(q,card){
+  var wrap=el('div','tf'); card.insertBefore(wrap,$('cardFb'));
+  [['Wahr','✓',true],['Falsch','✗',false]].forEach(function(o){
+    var b=el('button',null,'<span class="e">'+o[1]+'</span>'+o[0]);
+    b.onclick=function(){
+      if(answered)return;
+      var correct = (o[2]===q.a);
+      wrap.querySelectorAll('button').forEach(function(x){x.disabled=true;});
+      b.classList.add(correct?'correct':'wrong');
+      if(!correct){ wrap.querySelectorAll('button')[q.a?0:1].classList.add('correct'); }
+      reveal(correct,q);
+    };
+    wrap.appendChild(b);
+  });
+  setFoot([{label:'Wahr oder Falsch?',fn:function(){},disabled:true}]);
+}
+
+/* match */
+function renderMatch(q,card){
+  card.insertBefore(el('div','qsub','Tippe links, dann den passenden Partner rechts.'),$('cardFb'));
+  var lefts=q.pairs.map(function(p){return p[0];});
+  var rights=q.pairs.map(function(p,i){return {txt:p[1],orig:i};});
+  var rOrder=shuffle(rights);
+  var wrap=el('div','match'); card.insertBefore(wrap,$('cardFb'));
+  var lc=el('div','mcol'), rc=el('div','mcol');
+  wrap.appendChild(lc); wrap.appendChild(rc);
+  var assign={}; // leftIndex -> position in rOrder
+  var activeL=null; var lEls=[],rEls=[];
+  lefts.forEach(function(t,i){
+    var b=el('button','mitem','<span>'+t+'</span>');
+    b.onclick=function(){ if(answered)return;
+      if(assign[i]!=null){ // clear
+        var rp=assign[i]; delete assign[i]; rEls[rp].classList.remove('used'); rEls[rp].dataset.l='';
+        b.querySelector('.mbadge')&&b.querySelector('.mbadge').remove(); refresh();
+        return;
+      }
+      activeL=(activeL===i?null:i); refresh();
+    };
+    lEls.push(b); lc.appendChild(b);
+  });
+  rOrder.forEach(function(r,p){
+    var b=el('button','mitem','<span>'+r.txt+'</span>');
+    b.onclick=function(){ if(answered)return; if(activeL==null)return; if(b.classList.contains('used'))return;
+      assign[activeL]=p; b.classList.add('used'); b.dataset.l=activeL;
+      var badge=lEls[activeL].querySelector('.mbadge'); if(!badge){badge=el('span','mbadge');lEls[activeL].appendChild(badge);}
+      badge.textContent=(p+1); var rb=el('span','mbadge');rb.textContent=(p+1);
+      // tag right with same number
+      b.querySelector('.mbadge')&&b.querySelector('.mbadge').remove(); b.appendChild(rb);
+      activeL=null; refresh();
+    };
+    rEls.push(b); rc.appendChild(b);
+  });
+  function refresh(){
+    lEls.forEach(function(b,i){b.classList.toggle('active',activeL===i);});
+    if(S._mf)S._mf.disabled=Object.keys(assign).length<lefts.length;
+  }
+  function check(){
+    if(answered)return; var ok=true;
+    lefts.forEach(function(t,i){
+      var p=assign[i]; var chosen=rOrder[p]; var correct=chosen&&chosen.orig===i;
+      if(!correct)ok=false;
+      lEls[i].classList.add(correct?'correct':'wrong');
+      lEls[i].disabled=true;
+    });
+    rEls.forEach(function(b){b.disabled=true;});
+    // build answer key in fb
+    var key=q.pairs.map(function(p){return '<b>'+p[0]+'</b> → '+p[1];}).join('<br>');
+    reveal(ok,q,{body:(q.fb?q.fb+'<br><br>':'')+key});
+  }
+  setFoot([{label:'Prüfen',fn:check,disabled:true}]); S._mf=$('footSlot').firstChild;
+}
+
+/* order */
+function renderOrder(q,card){
+  card.insertBefore(el('div','qsub','Bringe in die richtige Reihenfolge (▲▼).'),$('cardFb'));
+  var arr=shuffle(q.items.map(function(t,i){return {t:t,orig:i};}));
+  // ensure not already perfectly sorted
+  if(arr.every(function(x,i){return x.orig===i;}) && arr.length>1){ var t=arr[0];arr[0]=arr[1];arr[1]=t; }
+  var wrap=el('div','order'); card.insertBefore(wrap,$('cardFb'));
+  function draw(){
+    wrap.innerHTML='';
+    arr.forEach(function(it,i){
+      var row=el('div','oitem');
+      row.innerHTML='<span class="num">'+(i+1)+'</span><span class="lbl">'+it.t+'</span>';
+      var ar=el('div','arrows');
+      var up=el('button',null,'▲'), dn=el('button',null,'▼');
+      up.disabled=(i===0); dn.disabled=(i===arr.length-1);
+      up.onclick=function(){if(answered)return;var t=arr[i];arr[i]=arr[i-1];arr[i-1]=t;draw();};
+      dn.onclick=function(){if(answered)return;var t=arr[i];arr[i]=arr[i+1];arr[i+1]=t;draw();};
+      ar.appendChild(up);ar.appendChild(dn);row.appendChild(ar);
+      wrap.appendChild(row);
+    });
+  }
+  draw();
+  function check(){
+    if(answered)return; var ok=arr.every(function(x,i){return x.orig===i;});
+    wrap.querySelectorAll('.oitem').forEach(function(row,i){
+      row.classList.add(arr[i].orig===i?'correct':'wrong');
+      row.querySelectorAll('button').forEach(function(b){b.disabled=true;});
+    });
+    var key='Richtig: '+q.items.map(function(t,i){return (i+1)+'. '+t;}).join(' · ');
+    reveal(ok,q,{body:(q.fb?q.fb+'<br><br>':'')+key});
+  }
+  setFoot([{label:'Prüfen',fn:check}]);
+}
+
+/* gap */
+function renderGap(q,card){
+  var inp=el('input','gapin'); inp.type='text'; inp.placeholder='Antwort eingeben…';
+  inp.autocomplete='off'; inp.autocapitalize='off'; inp.spellcheck=false;
+  card.insertBefore(inp,$('cardFb'));
+  function check(){
+    if(answered)return; var v=norm(inp.value);
+    if(!v)return;
+    var acc=q.a.map(norm);
+    var ok = acc.some(function(a){ return a===v || (a.length>4 && lev(a,v)<=1) || (a.length>6 && (v.indexOf(a)>=0||a.indexOf(v)>=0)); });
+    inp.disabled=true; inp.style.borderColor=ok?'var(--good)':'var(--bad)';
+    inp.style.background=ok?'var(--good-soft)':'var(--bad-soft)';
+    reveal(ok,q,{body:(q.fb?q.fb+'<br><br>':'')+'Akzeptiert: <b>'+q.a[0]+'</b>'});
+  }
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')check();});
+  setTimeout(function(){inp.focus();},100);
+  setFoot([{label:'Prüfen',fn:check}]);
+}
+
+/* estimate */
+function renderEst(q,card){
+  var box=el('div','est'); card.insertBefore(box,$('cardFb'));
+  var start=Math.round((q.min+q.max)/2/ (q.step||1))*(q.step||1);
+  var val=el('div','estval');
+  var rng=el('input','estrange'); rng.type='range'; rng.min=q.min;rng.max=q.max;rng.step=q.step||1;rng.value=start;
+  function fmt(v){return v+(q.unit?(' '+q.unit):'');}
+  val.textContent=fmt(start);
+  rng.oninput=function(){val.textContent=fmt(rng.value);};
+  var mm=el('div','estminmax','<span>'+fmt(q.min)+'</span><span>'+fmt(q.max)+'</span>');
+  box.appendChild(val);box.appendChild(rng);box.appendChild(mm);
+  function check(){
+    if(answered)return; var v=Number(rng.value); rng.disabled=true;
+    var ok=Math.abs(v-q.ans)<=q.tol;
+    val.style.color=ok?'var(--good)':'var(--bad)';
+    reveal(ok,q,{body:(q.fb?q.fb+'<br><br>':'')+'Deine Schätzung: <b>'+fmt(v)+'</b> · Richtig: <b>'+fmt(q.ans)+'</b> (±'+q.tol+')'});
+  }
+  setFoot([{label:'Prüfen',fn:check}]);
+}
+
+/* flip */
+function renderFlip(q,card){
+  var fc=el('div','flipcard', q.front); card.insertBefore(fc,$('cardFb'));
+  function flip(){ phase=1; fc.innerHTML=q.reveal; fc.style.borderColor='var(--brand)';
+    setFoot([{label:'❌ Wusste ich nicht',cls:'ghost',fn:function(){reveal(false,q,{self:true,body:q.reveal});}},
+             {label:'✅ Gewusst',cls:'good',fn:function(){reveal(true,q,{self:true,body:q.reveal});}}]); }
+  setFoot([{label:'Antwort zeigen',fn:flip}]);
+}
+
+/* recall */
+function renderRecall(q,card){
+  if(q.hint) card.insertBefore(el('div','hintbox','💡 Tipp: '+q.hint),$('cardFb'));
+  function show(){
+    var mb=el('div','modelbox','<b>Musterantwort:</b><br>'+q.model); card.insertBefore(mb,$('cardFb'));
+    setFoot([{label:'❌ Wusste ich nicht',cls:'ghost',fn:function(){reveal(false,q,{self:true,body:q.model});}},
+             {label:'✅ Gewusst',cls:'good',fn:function(){reveal(true,q,{self:true,body:q.model});}}]);
+  }
+  setFoot([{label:'Musterantwort zeigen',fn:show}]);
+}
+
+/* ---------- result ---------- */
+function finish(){
+  $('pbarFill').style.width='100%';
+  bumpStreak();
+  var n=S.queue.length, c=S.correct, pct=Math.round(c/n*100);
+  var key=S.label; if((store.best[key]||0)<pct){store.best[key]=pct;save();}
+  $('quizView').classList.add('hidden');
+  $('resultView').classList.remove('hidden');
+  var ring=$('resRing');
+  var col = pct>=80?'var(--good)':(pct>=50?'var(--gold)':'var(--bad)');
+  ring.style.background='conic-gradient('+col+' '+pct+'%, var(--line) 0)';
+  ring.innerHTML='<div style="width:104px;height:104px;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--ink);font-size:30px">'+pct+'%</div>';
+  var emo = pct>=80?'🏆':(pct>=50?'👍':'📚');
+  $('resTitle').textContent = emo+' '+c+' von '+n+' richtig';
+  $('resSub').textContent = S.label;
+  $('resPills').innerHTML='<span class="pill">+'+S.xp+' XP</span><span class="pill">🔥 '+store.sc+' Tage</span><span class="pill">Bestwert: '+store.best[key]+'%</span>';
+  $('resAgain').onclick=function(){startQuiz(S.filter,S.label,S.color);};
+  $('resHome').onclick=function(){ renderHome();};
+}
+
+/* ---------- floating aromarad button ---------- */
+function initWheelFab(){
+  if(!CFG.tracks.some(function(t){return t.wheel;})) return;
+  var st=document.createElement('style');
+  st.textContent='.fab{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:55;width:54px;height:54px;border-radius:50%;background:var(--brand);color:#fff;font-size:25px;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.3);border:2px solid var(--card)}'
+    +'.fab:active{transform:translateY(1px)}'
+    +'.has-fab .foot{padding-left:64px}'
+    +'.sheet{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column}'
+    +'.sheet.on{display:flex}'
+    +'.sheetbar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--line);background:var(--card)}'
+    +'.sheetbar b{flex:1;font-weight:800;font-size:16px}'
+    +'.sheetbar button{font-size:19px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:6px 12px}'
+    +'.sheet iframe{flex:1;width:100%;border:0;display:block}';
+  document.head.appendChild(st);
+  document.body.classList.add('has-fab');
+  var fab=el('button','fab','🎡'); fab.setAttribute('aria-label','Aromarad öffnen');
+  var sheet=el('div','sheet');
+  var bar=el('div','sheetbar'); var title=el('b',null,'🎡 Aromarad'); var close=el('button',null,'✕'); close.setAttribute('aria-label','Schließen');
+  bar.appendChild(title); bar.appendChild(close);
+  var ifr=document.createElement('iframe'); ifr.id='aromaFabFrame'; ifr.title='Aromarad';
+  sheet.appendChild(bar); sheet.appendChild(ifr);
+  document.body.appendChild(fab); document.body.appendChild(sheet);
+  fab.onclick=function(){ if(!ifr.getAttribute('src')){ ifr.setAttribute('src',(CFG.wheelSrc||'aromarad.html')+'?theme='+((store.theme==='dark')?'dark':'light')); } sheet.classList.add('on'); };
+  close.onclick=function(){ sheet.classList.remove('on'); };
+}
+
+/* ---------- init ---------- */
+applyTheme(); refreshHeader(); renderHome(); initWheelFab();
+</script>
+</body>
+</html>
